@@ -18,6 +18,7 @@ CAI::CAI(CGameContext *pGameServer, CPlayer *pPlayer)
 	m_pPath = 0;
 	m_pVisible = 0;
 	
+	m_PowerLevel = 0;
 	Reset();
 }
 
@@ -673,11 +674,13 @@ void CAI::ReactToPlayer()
 
 
 
-void CAI::ShootAtClosestEnemy()
+bool CAI::ShootAtClosestEnemy()
 {
 	CCharacter *pClosestCharacter = NULL;
 	int ClosestDistance = 0;
 	
+	m_EnemyInLine = false;
+
 	// FIRST_BOT_ID, fix
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -699,15 +702,29 @@ void CAI::ShootAtClosestEnemy()
 			continue;
 			
 		int Distance = distance(pCharacter->m_Pos, m_LastPos);
-		if (Distance < 800 && 
+		if (Distance < 800 &&
 			!GameServer()->Collision()->FastIntersectLine(pCharacter->m_Pos, m_LastPos))
 		{
+			if (abs(pCharacter->m_Pos.x - m_LastPos.x) < 96 && abs(pCharacter->m_Pos.y - m_LastPos.y) < 22)
+				m_EnemyInLine = true;
+
 			if (!pClosestCharacter || Distance < ClosestDistance)
 			{
 				pClosestCharacter = pCharacter;
 				ClosestDistance = Distance;
-				m_PlayerDirection = pCharacter->m_Pos - m_LastPos;
-				m_PlayerPos = pCharacter->m_Pos;
+
+				float t = m_DispersionTick * 0.1f;
+				vec2 Dispersion = vec2(11 * cos(t) - 6 * cos(11.0f / 6 * t),
+									   11 * sin(t) - 6 * sin(11.0f / 6 * t));
+
+				// range 64 - 0, power level range 20
+				Dispersion *= 3.765f - m_PowerLevel * 0.188f;
+				Dispersion *= 2.0f;
+
+				Dispersion *= Distance * 0.005f;
+
+				m_PlayerDirection = pCharacter->m_Pos - m_LastPos + Dispersion;
+				m_PlayerPos = pCharacter->m_Pos + Dispersion;
 			}
 		}
 	}
@@ -720,7 +737,7 @@ void CAI::ShootAtClosestEnemy()
 			m_Direction = AttackDirection;
 		
 		// shooting part
-		if (m_AttackTimer++ > g_Config.m_SvBotReactTime)
+		if (m_AttackTimer++ > max(0, 20 - m_PowerLevel))
 		{
 			if (ClosestDistance < WeaponShootRange() && abs(atan2(m_Direction.x, m_Direction.y) - atan2(AttackDirection.x, AttackDirection.y)) < PI / 4.0f)
 			{
@@ -732,6 +749,8 @@ void CAI::ShootAtClosestEnemy()
 	}
 		
 	Player()->GetCharacter()->AutoWeaponChange();
+
+	return true;
 }
 
 
@@ -977,7 +996,8 @@ void CAI::Tick()
 	if (m_NextReaction <= 0)
 	{
 		m_NextReaction = m_ReactionTime;
-	
+
+		m_EnemyInLine = false;
 		DoBehavior();
 		
 		if (m_DontMoveTick > GameServer()->Server()->Tick())

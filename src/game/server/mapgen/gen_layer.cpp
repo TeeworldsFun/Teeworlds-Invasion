@@ -1,4 +1,5 @@
 #include <base/system.h>
+#include <base/math.h>
 #include <engine/shared/config.h>
 
 #include "gen_layer.h"
@@ -225,6 +226,9 @@ void CGenLayer::GenerateBoxes()
 
 void CGenLayer::GeneratePlatforms()
 {
+	// Dont do it.
+	return;
+
 	int n = 3 + rand()%12;
 		
 	for (int k = 0; k < Size()/16; k++)

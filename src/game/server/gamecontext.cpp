@@ -17,13 +17,14 @@
 #include "gamemodes/dom.h"
 #include "gamemodes/cstt.h"
 #include "gamemodes/csbb.h"
-#include "gamemodes/mod.h"
+#include "gamemodes/run.h"
 
 #include <game/server/entities/arrow.h>
 
 #include <game/server/ai_protocol.h>
 #include <game/server/ai.h>
 
+#include <engine/shared/datafile.h> // MapGen
 
 
 
@@ -2064,6 +2065,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
+	m_pStorage = Kernel()->RequestInterface<IStorage>(); // MapGen
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
 
@@ -2075,14 +2077,15 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 	m_Layers.Init(Kernel());
 	m_Collision.Init(&m_Layers);
+	m_MapGen.Init(&m_Layers, &m_Collision, m_pStorage); // MapGen
 
 	// reset everything here
 	//world = new GAMEWORLD;
 	//players = new CPlayer[MAX_CLIENTS];
 
 	// select gametype
-	if(str_comp(g_Config.m_SvGametype, "mod") == 0)
-		m_pController = new CGameControllerMOD(this);
+	if(str_comp(g_Config.m_SvGametype, "coop") == 0)
+		m_pController = new CGameControllerCoop(this);
 	else if(str_comp(g_Config.m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
 	else if(str_comp(g_Config.m_SvGametype, "dom") == 0)
@@ -2095,6 +2098,9 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerCSBB(this);
 	else
 		m_pController = new CGameControllerDM(this);
+
+	if (g_Config.m_SvMapGen && !m_pServer->m_MapGenerated && str_comp(g_Config.m_SvGametype, "coop") == 0)
+		GenerateMap();
 
 	// setup core world
 	//for(int i = 0; i < MAX_CLIENTS; i++)
@@ -2602,4 +2608,37 @@ void CGameContext::AddBot()
 	}
 	*/
 	Server()->AddZombie();
+}
+
+// MapGen
+void CGameContext::SaveMap(const char *path)
+{
+    IMap *pMap = Layers()->Map();
+    if (!pMap)
+        return;
+
+    CDataFileWriter fileWrite;
+    char aMapFile[512];
+	//str_format(aMapFile, sizeof(aMapFile), "maps/%s_%d.map", Server()->GetMapName(), g_Config.m_SvMapGenSeed);
+	str_format(aMapFile, sizeof(aMapFile), "maps/Dungeon_S%d_L%d.map", g_Config.m_SvMapGenSeed, g_Config.m_SvMapGenLevel);
+		
+	// Map will be saved to current dir, not to ~/.ninslash/maps or to data/maps, so we need to create a dir for it
+	Storage()->CreateFolder("maps", IStorage::TYPE_SAVE);
+		
+    fileWrite.SaveMap(Storage(), pMap->GetFileReader(), aMapFile);
+
+    char aBuf[128];
+    str_format(aBuf, sizeof(aBuf), "Map saved in '%s'!", aMapFile);
+    Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+}
+
+void CGameContext::GenerateMap()
+{
+	m_MapGen.FillMap();
+	SaveMap("");
+		
+	char mapName[256];
+	str_format(mapName, sizeof(mapName), "Dungeon_S%d_L%d", g_Config.m_SvMapGenSeed, g_Config.m_SvMapGenLevel);
+	str_copy(g_Config.m_SvMap, mapName, sizeof(g_Config.m_SvMap));
+	m_pServer->m_MapGenerated = true;
 }

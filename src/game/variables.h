@@ -137,6 +137,13 @@ MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SERVER, "Allow votin
 MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
 MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
 
+// MapGen
+MACRO_CONFIG_INT(SvMapGen, sv_mapgen, 1, 0, 1, CFGFLAG_SERVER, "Map Generation Status")
+MACRO_CONFIG_INT(SvMapGenLevel, sv_mapgen_level, 1, 1, 9999, CFGFLAG_SERVER, "Map Difficulty")
+MACRO_CONFIG_INT(SvMapGenSeed, sv_mapgen_seed, 0, 0, 32767, CFGFLAG_SERVER, "Map generation seed")
+MACRO_CONFIG_INT(SvMapGenRandSeed, sv_mapgen_random_seed, 1, 0, 1, CFGFLAG_SERVER, "Random map generation seed")
+
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")

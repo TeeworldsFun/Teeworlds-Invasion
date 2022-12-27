@@ -15,6 +15,8 @@
 #include "gameworld.h"
 #include "player.h"
 
+#include <engine/storage.h> // MapGen
+#include "mapgen.h"
 
 /*
 	Tick
@@ -45,6 +47,9 @@ class CGameContext : public IGameServer
 	CCollision m_Collision;
 	CNetObjHandler m_NetObjHandler;
 	CTuningParams m_Tuning;
+	// MapGen
+	CMapGen m_MapGen;
+	IStorage *m_pStorage;
 
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
@@ -75,6 +80,10 @@ public:
 	class IConsole *Console() { return m_pConsole; }
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
+	// MapGen
+	CLayers *Layers() { return &m_Layers; }
+	IStorage *Storage() const { return m_pStorage; }
+	CMapGen *MapGen() { return &m_MapGen; }
 
 	CGameContext();
 	~CGameContext();
@@ -212,6 +221,10 @@ public:
 	void ClearShopVotes(int ClientID);
 	void AddCustomVote(const char * Desc, const char * Cmd, int Type, int WeaponIndex = -1);
 	void AddVote(const char * Desc, const char * Cmd, int ClientID = -1);
+
+	// MapGen
+	virtual void SaveMap(const char *path);
+	void GenerateMap();
 };
 
 inline int CmaskAll() { return -1; }

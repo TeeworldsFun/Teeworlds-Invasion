@@ -1676,6 +1676,11 @@ void CCharacter::SetHealth(int Health)
 	m_HiddenHealth = Health;
 }
 
+void CCharacter::SetArmor(int Armor)
+{
+	m_Armor = Armor;
+}
+
 bool CCharacter::IncreaseHealth(int Amount)
 {
 	if(m_HiddenHealth >= m_MaxHealth)

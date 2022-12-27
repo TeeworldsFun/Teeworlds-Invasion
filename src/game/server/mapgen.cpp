@@ -1,3 +1,4 @@
+// Ninslash
 #include <random>
 
 #include <stdio.h>	// sscanf
@@ -216,7 +217,7 @@ void CMapGen::GenerateEnd(CGenLayer *pTiles)
 					pTiles->Get(x-3, y+1) && pTiles->Get(x-2, y+1) && pTiles->Get(x-1, y+1) && pTiles->Get(x, y+1) && pTiles->Get(x+1, y+1) && pTiles->Get(x+2, y+1) && pTiles->Get(x+3, y+1) &&
 					!pTiles->Get(x, y-2) && !pTiles->Get(x, y-3) && !pTiles->Get(x, y-4) && !pTiles->Get(x, y-5))
 				{
-					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), ENTITY_OFFSET+ENTITY_DOOR1);
+					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), ENTITY_OFFSET+ENTITY_SPAWN);
 					
 					pTiles->m_EndPos = ivec2(x, y);
 					
@@ -249,7 +250,7 @@ void CMapGen::GenerateEnd(CGenLayer *pTiles)
 					pTiles->Get(x-3, y+1) && pTiles->Get(x-2, y+1) && pTiles->Get(x-1, y+1) && pTiles->Get(x, y+1) && pTiles->Get(x+1, y+1) && pTiles->Get(x+2, y+1) && pTiles->Get(x+3, y+1) &&
 					!pTiles->Get(x, y-2) && !pTiles->Get(x, y-3) && !pTiles->Get(x, y-4) && !pTiles->Get(x, y-5))
 				{
-					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), ENTITY_OFFSET+ENTITY_DOOR1);
+					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), ENTITY_OFFSET+ENTITY_SHOP);
 					
 					pTiles->m_EndPos = ivec2(x, y);
 					
@@ -423,10 +424,10 @@ void CMapGen::GenerateConveyorBelt(CGenLayer *pTiles)
 	if (p.x == 0)
 		return;
 	
-	int i = TILE_MOVELEFT;
+	int i = TILE_AILEFT;
 	
 	if (frandom() < 0.5f)
-		i = TILE_MOVERIGHT;
+		i = TILE_AIRIGHT;
 	
 	for (int x = p.x; x <= p.z; x++)
 		ModifTile(ivec2(x, p.y), m_pLayers->GetGameLayerIndex(), i);
@@ -443,7 +444,7 @@ void CMapGen::GenerateHangables(CGenLayer *pTiles)
 
 	for (int x = p.x; x <= p.z; x++)
 	{
-		ModifTile(ivec2(x, p.y), m_pLayers->GetGameLayerIndex(), TILE_HANG);
+		ModifTile(ivec2(x, p.y), m_pLayers->GetGameLayerIndex(), TILE_AIUP);
 		if (frandom() < 0.11f)
 			ModifTile(ivec2(x, p.y), m_pLayers->GetForegroundLayerIndex(), 91, 0);
 		else
@@ -1022,7 +1023,7 @@ void CMapGen::GenerateLevel()
 				ModifTile(ivec2(x, y), m_pLayers->GetForegroundLayerIndex(), i, f);
 				
 				if (i >= 14*16+1 && i <= 14*16+3)
-					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), TILE_PLATFORM);
+					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), TILE_AIR);
 				else
 					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), 1);
 			}
@@ -1656,7 +1657,7 @@ void CMapGen::WriteLayers(CGenLayer *pTiles)
 				ModifTile(ivec2(x, y), m_pLayers->GetForegroundLayerIndex(), i, f);
 				
 				if (i >= 14*16+1 && i <= 14*16+3)
-					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), TILE_PLATFORM);
+					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), TILE_AIR);
 				else
 					ModifTile(ivec2(x, y), m_pLayers->GetGameLayerIndex(), 1);
 			}

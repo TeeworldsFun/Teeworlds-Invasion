@@ -1,5 +1,3 @@
-/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
-/* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 #include <base/system.h>
 
@@ -27,7 +25,7 @@ void CMapChecker::Init()
 
 void CMapChecker::SetDefaults()
 {
-	AddMaplist(s_aMapVersionList, s_NumMapVersionItems);
+	//AddMaplist(s_aMapVersionList, s_NumMapVersionItems);
 	m_RemoveDefaultList = true;
 }
 
@@ -104,4 +102,14 @@ bool CMapChecker::ReadAndValidateMap(IStorage *pStorage, const char *pFilename, 
 		}
 	}
 	return StandardMap?false:true;
+}
+
+// MapGen
+bool CMapChecker::Exists(class IStorage *pStorage, const char *pFilename, int StorageType)
+{
+	CDataFileReader DataFile;
+	if(!DataFile.Open(pStorage, pFilename, StorageType))
+		return false;
+	DataFile.Close();
+	return true;
 }

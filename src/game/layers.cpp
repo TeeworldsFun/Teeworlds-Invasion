@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "layers.h"
 
+#include <game/gamecore.h> // MapGen
+
 CLayers::CLayers()
 {
 	m_GroupsNum = 0;
@@ -29,6 +31,37 @@ void CLayers::Init(class IKernel *pKernel)
 			if(pLayer->m_Type == LAYERTYPE_TILES)
 			{
 				CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
+
+				// MapGen: Layers access info (Doesn't need group info because is supposed are in Game Layer Group)
+				char layerName[64]={0};
+				IntsToStr(pTilemap->m_aName, sizeof(pTilemap->m_aName)/sizeof(int), layerName);
+				if (!m_pBackgrounLayer && str_comp_nocase(layerName, "background") == 0)
+				{
+					m_pBackgrounLayer = pTilemap;
+					m_BackgrounLayerIndex = l;
+				}
+				else if (!m_pDoodadsLayer && str_comp_nocase(layerName, "doodads") == 0)
+				{
+					m_pDoodadsLayer = pTilemap;
+					m_DoodadsLayerIndex = l;
+				}
+				else if (!m_pBase1Layer && str_comp_nocase(layerName, "base1") == 0)
+				{
+					m_pBase1Layer = pTilemap;
+					m_Base1LayerIndex = l;
+				}
+				else if (!m_pBase2Layer && str_comp_nocase(layerName, "base2") == 0)
+				{
+					m_pBase2Layer = pTilemap;
+					m_Base2LayerIndex = l;
+					break; // Finish here... in not generated maps increase the CPU usage :/
+				}
+				else if (!m_pForegroundLayer && str_comp_nocase(layerName, "foreground") == 0)
+				{
+					m_pForegroundLayer = pTilemap;
+					m_ForegroundLayerIndex = l;
+				}
+
 				if(pTilemap->m_Flags&TILESLAYERFLAG_GAME)
 				{
 					m_pGameLayer = pTilemap;
@@ -49,7 +82,9 @@ void CLayers::Init(class IKernel *pKernel)
 						m_pGameGroup->m_ClipH = 0;
 					}
 
-					break;
+					// MapGen: Game layer access info
+					m_GameGroupIndex = g;
+					m_GameLayerIndex = l;
 				}
 			}
 		}

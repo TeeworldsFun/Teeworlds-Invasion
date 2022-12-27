@@ -508,6 +508,14 @@ void IGameController::ChangeMap(const char *pToMap)
 
 void IGameController::CycleMap()
 {
+	if (str_comp(g_Config.m_SvGametype, "coop") == 0)
+	{
+		g_Config.m_SvMapGenSeed = rand()%400+1;
+		g_Config.m_SvMapGenLevel = rand()%400+1;
+
+		GameServer()->GenerateMap();
+		return;
+	}
 	if(m_aMapWish[0] != 0)
 	{
 		char aBuf[256];

@@ -39,6 +39,8 @@ protected:
 	
 	void ReactToPlayer();
 	
+	bool m_EnemyInLine;
+
 	// emotions
 	float m_aAnger[16]; // MAX_CLIENTS
 	float m_aAttachment[16]; // MAX_CLIENTS
@@ -125,9 +127,15 @@ protected:
 	bool SeekClosestEnemy();
 	bool SeekClosestEnemyInSight();
 	
-	void ShootAtClosestEnemy();
+	bool ShootAtClosestEnemy();
 	int WeaponShootRange();
 	
+	int m_PowerLevel;
+	int m_DispersionTick;
+	
+	// invasion
+	int m_TriggerLevel;
+	bool m_Triggered;
 public:
 	CAI(class CGameContext *pGameServer, class CPlayer *pPlayer);
 	

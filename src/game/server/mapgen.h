@@ -1,3 +1,4 @@
+// Ninslash
 #ifndef GAME_MAPGEN_H
 #define GAME_MAPGEN_H
 

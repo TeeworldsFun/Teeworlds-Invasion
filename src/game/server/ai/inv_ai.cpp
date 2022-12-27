@@ -1,0 +1,330 @@
+#include <engine/shared/config.h>
+
+#include <game/server/ai.h>
+#include <game/server/entities/character.h>
+#include <game/server/player.h>
+#include <game/server/gamecontext.h>
+
+#include <base/math.h>
+#include "inv_ai.h"
+
+CAIinvasion::CAIinvasion(CGameContext *pGameServer, CPlayer *pPlayer, int Level)
+	: CAI(pGameServer, pPlayer)
+{
+	m_SkipMoveUpdate = 0;
+	m_StartPos = vec2(0, 0);
+	m_Triggered = false;
+	m_TriggerLevel = 5 + rand() % 6;
+
+	m_Level = Level;
+	m_EType = SKIN_ALIEN1 + min(m_Level, (int)NUM_SKINS);
+
+	m_AttackOnDamage = false;
+	m_AttackOnDamageTick = 0;
+
+	m_MoveReactTime = 0;
+}
+
+void CAIinvasion::GiveWeapon(CCharacter *pChr, int W)
+{
+	pChr->GiveCustomWeapon(W);
+	pChr->SetCustomWeapon(W);
+}
+
+void CAIinvasion::OnCharacterSpawn(CCharacter *pChr)
+{
+	CAI::OnCharacterSpawn(pChr);
+
+	m_WaypointDir = vec2(0, 0);
+	// Player()->SetRandomSkin();
+
+	m_PowerLevel = 2;
+
+	m_StartPos = Player()->GetCharacter()->m_Pos;
+	m_TargetPos = Player()->GetCharacter()->m_Pos;
+
+	switch (m_EType)
+	{
+	case SKIN_ALIEN1:
+		if (frandom() < min(m_Level * 0.1f, 1.0f))
+			GiveWeapon(pChr, GUN_PISTOL);
+		else if (frandom() < min(m_Level * 0.1f, 1.0f))
+			GiveWeapon(pChr, GUN_UZI);
+
+		if (frandom() < 0.6f)
+			GiveWeapon(pChr, GUN_MAGNUM);
+		else
+			GiveWeapon(pChr, GUN_TASER);
+
+		pChr->SetHealth(60 + min((m_Level - 1) * 3, 300));
+		break;
+
+	case SKIN_ALIEN2:
+		GiveWeapon(pChr, SWORD_LIGHTNING);
+		pChr->SetHealth(60 + min((m_Level - 1) * 4, 300));
+		pChr->SetArmor(60 + min((m_Level - 1) * 4, 300));
+		m_PowerLevel = 8;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_ALIEN3:
+		GiveWeapon(pChr, GRENADE_GRENADELAUNCHER);
+		pChr->SetHealth(60 + min((m_Level - 1) * 4, 300));
+		pChr->SetArmor(60 + min((m_Level - 1) * 4, 300));
+		m_PowerLevel = 8;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_ALIEN4:
+		GiveWeapon(pChr, GUN_MAGNUM);
+		pChr->SetHealth(60 + min((m_Level - 1) * 4, 200));
+		pChr->SetArmor(60 + min((m_Level - 1) * 4, 350));
+		m_PowerLevel = 12;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_ALIEN5:
+		GiveWeapon(pChr, GRENADE_DOOMLAUNCHER);
+		pChr->SetHealth(50 + min((m_Level - 1) * 4, 150));
+		pChr->SetArmor(60 + min((m_Level - 1) * 4, 300));
+		m_PowerLevel = 10;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_BUNNY1:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, GRENADE_GRENADELAUNCHER);
+		else
+			GiveWeapon(pChr, GRENADE_DOOMLAUNCHER);
+
+		pChr->SetHealth(40 + min(m_Level * 3.0f, 220.0f));
+		break;
+
+	case SKIN_BUNNY2:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, GRENADE_GRENADELAUNCHER);
+		else
+			GiveWeapon(pChr, RIFLE_DOOMRAY);
+
+		GiveWeapon(pChr, GRENADE_ELECTROLAUNCHER);
+
+		pChr->SetHealth(80 + min(m_Level * 4.0f, 320.0f));
+		m_PowerLevel = 12;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_BUNNY3:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, GRENADE_GRENADELAUNCHER);
+		else
+			GiveWeapon(pChr, RIFLE_HEAVYRIFLE);
+
+		pChr->SetHealth(80 + min(m_Level * 5.0f, 320.0f));
+		m_PowerLevel = 12;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_BUNNY4:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, SWORD_KATANA);
+		else
+			GiveWeapon(pChr, SWORD_LIGHTNING);
+
+		m_AttackOnDamage = true;
+
+		pChr->SetHealth(80 + min(m_Level * 5.0f, 320.0f));
+		m_PowerLevel = 14;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_FOXY1:
+		GiveWeapon(pChr, GUN_TASER);
+
+		pChr->SetHealth(80 + min(m_Level * 5.0f, 320.0f));
+		m_PowerLevel = 12;
+		m_TriggerLevel = 15 + rand() % 5;
+		break;
+
+	case SKIN_PYRO1:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, SWORD_LIGHTNING);
+		else
+			GiveWeapon(pChr, GUN_TASER);
+		break;
+	case SKIN_PYRO2:
+		if (frandom() < 0.35f)
+			GiveWeapon(pChr, HAMMER_THUNDER);
+		else
+			GiveWeapon(pChr, SHOTGUN_DOUBLEBARREL);
+		break;
+
+	case SKIN_PYRO3:
+		if (frandom() < 0.35f)
+			GiveWeapon(pChr, RIFLE_DOOMRAY);
+		else
+		{
+			GiveWeapon(pChr, SHOTGUN_DOUBLEBARREL);
+			m_AttackOnDamage = true;
+		}
+		break;
+
+	case SKIN_ROBO1:
+		m_PowerLevel = 6;
+		pChr->SetHealth(50 + min(m_Level * 3.0f, 100.0f));
+		pChr->SetArmor(50 + min(m_Level * 3.0f, 100.0f));
+		GiveWeapon(pChr, GRENADE_ELECTROLAUNCHER);
+		break;
+
+	case SKIN_ROBO2:
+		m_PowerLevel = 2;
+		pChr->SetHealth(100 + min(m_Level * 3.0f, 200.0f));
+		pChr->SetArmor(100 + min(m_Level * 3.0f, 200.0f));
+		GiveWeapon(pChr, SWORD_KATANA);
+		break;
+
+	case SKIN_ROBO3:
+		m_PowerLevel = 6;
+		pChr->SetHealth(100 + min(m_Level * 4.0f, 200.0f));
+		pChr->SetArmor(100 + min(m_Level * 4.0f, 300.0f));
+		GiveWeapon(pChr, GUN_TASER);
+		GiveWeapon(pChr, GRENADE_DOOMLAUNCHER);
+		pChr->m_Kits = 1;
+		break;
+
+	case SKIN_ROBO4:
+		m_PowerLevel = 10;
+		pChr->SetHealth(150 + min(m_Level * 5.0f, 200.0f));
+		pChr->SetArmor(150 + min(m_Level * 5.0f, 300.0f));
+		GiveWeapon(pChr, GRENADE_ELECTROLAUNCHER);
+		GiveWeapon(pChr, GRENADE_DOOMLAUNCHER);
+		pChr->m_Kits = 1;
+		break;
+
+	case SKIN_ROBO5:
+		m_PowerLevel = 14;
+		pChr->SetHealth(150 + min(m_Level * 4.0f, 200.0f));
+		pChr->SetArmor(150 + min(m_Level * 4.0f, 300.0f));
+		GiveWeapon(pChr, SWORD_LIGHTNING);
+		m_AttackOnDamage = true;
+		break;
+
+	case SKIN_SKELETON1:
+		GiveWeapon(pChr, GRENADE_ELECTROLAUNCHER);
+		break;
+
+	case SKIN_SKELETON2:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, SWORD_KATANA);
+		else
+			GiveWeapon(pChr, SWORD_LIGHTNING);
+		break;
+
+	case SKIN_SKELETON3:
+		if (frandom() < 0.5f)
+			GiveWeapon(pChr, GUN_UZI);
+		else
+			GiveWeapon(pChr, GRENADE_DOOMLAUNCHER);
+		break;
+
+	default:
+		break;
+	}
+
+	if (!m_Triggered)
+		m_ReactionTime = 100;
+}
+
+void CAIinvasion::ReceiveDamage(int CID, int Dmg)
+{
+	if (CID >= 0 && frandom() < Dmg * 0.02f)
+		m_Triggered = true;
+
+	if (m_PowerLevel < 10)
+		m_Attack = 0;
+
+	if (m_AttackOnDamage)
+	{
+		m_Attack = 1;
+		m_InputChanged = true;
+		m_AttackOnDamageTick = GameServer()->Server()->Tick() + GameServer()->Server()->TickSpeed();
+	}
+}
+
+void CAIinvasion::DoBehavior()
+{
+	m_Attack = 0;
+
+	HeadToMovingDirection();
+	SeekClosestEnemyInSight();
+	bool Shooting = false;
+
+	// if we see a player
+	if (m_EnemiesInSight > 0)
+	{
+		ReactToPlayer();
+		// m_Triggered = true;
+
+		if (!m_MoveReactTime)
+			m_MoveReactTime++;
+
+		if (ShootAtClosestEnemy())
+		{
+			Shooting = true;
+
+			if (WeaponShootRange() - m_PlayerDistance > 200)
+			{
+				m_TargetPos = normalize(m_Pos - m_PlayerPos) * WeaponShootRange();
+				GameServer()->Collision()->IntersectLine(m_Pos, m_TargetPos, 0x0, &m_TargetPos);
+				// MoveTowardsWaypoint(true);
+				//
+			}
+		}
+		else
+		{
+			if (SeekClosestEnemy())
+			{
+				m_TargetPos = m_PlayerPos;
+
+				// if (WeaponShootRange() - m_PlayerDistance > 200)
+				//	SeekRandomWaypoint();
+			}
+		}
+	}
+	else if (!m_Triggered)
+	{
+		m_TargetPos = m_StartPos;
+	}
+	else
+	{
+		if (SeekClosestEnemy())
+			m_TargetPos = m_PlayerPos;
+	}
+
+	if ((Shooting && Player()->GetCharacter()->IsGrounded()) || (abs(m_Pos.x - m_TargetPos.x) < 40 && abs(m_Pos.y - m_TargetPos.y) < 40))
+	{
+		// stand still
+		m_Move = 0;
+		m_Jump = 0;
+		m_Hook = 0;
+	}
+	else
+	{
+		if (!m_MoveReactTime || m_MoveReactTime++ > 9)
+		{
+			if (UpdateWaypoint())
+			{
+				MoveTowardsWaypoint();
+			}
+			else
+			{
+				m_WaypointPos = m_TargetPos;
+				MoveTowardsWaypoint(true);
+			}
+		}
+	}
+
+	RandomlyStopShooting();
+
+	// next reaction in
+	m_ReactionTime = 1 + rand() % 3;
+}

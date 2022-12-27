@@ -39,6 +39,12 @@ public:
 		COLFLAG_SOLID=1,
 		COLFLAG_DEATH=2,
 		COLFLAG_NOHOOK=4,
+		COLFLAG_RAMP_LEFT=8,
+		COLFLAG_RAMP_RIGHT=16,
+		COLFLAG_ROOFSLOPE_LEFT=32,
+		COLFLAG_ROOFSLOPE_RIGHT=64,
+		COLFLAG_DAMAGEFLUID=128,
+		COLFLAG_INSTADEATH=256,
 	};
 	
 	bool IsTileSolid(int x, int y, bool IncludeDeath = false);
@@ -74,6 +80,9 @@ public:
 	void MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces);
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity);
 	bool TestBox(vec2 Pos, vec2 Size);
+
+	// MapGen
+	bool ModifTile(ivec2 pos, int group, int layer, int tile, int flags, int reserved);
 };
 
 #endif

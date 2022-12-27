@@ -1,5 +1,3 @@
-/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
-/* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 #include <engine/map.h>
 #include <engine/storage.h>
@@ -41,6 +39,8 @@ public:
 	{
 		return m_DataFile.Crc();
 	}
+
+	virtual CDataFileReader* GetFileReader() { return &m_DataFile; } // MapGen
 };
 
 extern IEngineMap *CreateEngineMap() { return new CMap; }

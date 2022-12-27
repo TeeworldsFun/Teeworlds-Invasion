@@ -11,7 +11,31 @@
 #include <game/server/upgradelist.h>
 #include <game/server/classabilities.h>
 
-
+enum Skins
+{
+	SKIN_ALIEN1,
+	SKIN_ALIEN2,
+	SKIN_ALIEN3,
+	SKIN_ALIEN4,
+	SKIN_ALIEN5,
+	SKIN_BUNNY1,
+	SKIN_BUNNY2,
+	SKIN_BUNNY3,
+	SKIN_FOXY1,
+	SKIN_BUNNY4,
+	SKIN_ROBO1,
+	SKIN_ROBO2,
+	SKIN_ROBO3,
+	SKIN_ROBO4,
+	SKIN_ROBO5,
+	SKIN_PYRO1,
+	SKIN_PYRO2,
+	SKIN_SKELETON1,
+	SKIN_SKELETON2,
+	SKIN_SKELETON3,
+	SKIN_PYRO3,
+	NUM_SKINS
+};
 
 enum TryBuyWeapon
 {
