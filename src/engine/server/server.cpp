@@ -848,6 +848,8 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	pThis->m_aClients[ClientID].m_AuthTries = 0;
 	pThis->m_aClients[ClientID].m_pRconCmdToSend = 0;
 	pThis->m_aClients[ClientID].m_Snapshots.PurgeAll();
+
+	pThis->ExpireServerInfo();
 	return 0;
 }
 
@@ -868,11 +870,22 @@ void CServer::SendCapabilities(int ClientID)
 
 void CServer::SendMap(int ClientID)
 {
-	CMsgPacker Msg(NETMSG_MAP_CHANGE, true);
-	Msg.AddString(GetMapName(), 0);
-	Msg.AddInt(m_CurrentMapCrc);
-	Msg.AddInt(m_CurrentMapSize);
-	SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
+	{
+		CMsgPacker Msg(NETMSG_MAP_DETAILS, true);
+		Msg.AddString(GetMapName(), 0);
+		Msg.AddRaw(&m_CurrentMapSha256.data, sizeof(m_CurrentMapSha256.data));
+		Msg.AddInt(m_CurrentMapCrc);
+		Msg.AddInt(m_CurrentMapSize);
+		Msg.AddString("", 0); // HTTPS map download URL
+		SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+	{
+		CMsgPacker Msg(NETMSG_MAP_CHANGE, true);
+		Msg.AddString(GetMapName(), 0);
+		Msg.AddInt(m_CurrentMapCrc);
+		Msg.AddInt(m_CurrentMapSize);
+		SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
+	}
 }
 
 void CServer::SendConnectionReady(int ClientID)
@@ -1031,6 +1044,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				m_aClients[ClientID].m_State = CClient::STATE_READY;
 				GameServer()->OnClientConnected(ClientID);
 				SendConnectionReady(ClientID);
+				ExpireServerInfo();
 			}
 		}
 		else if(Msg == NETMSG_ENTERGAME)
@@ -1046,6 +1060,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				m_aClients[ClientID].m_State = CClient::STATE_INGAME;
 				SendServerInfo(m_NetServer.ClientAddr(ClientID), -1, SERVERINFO_EXTENDED, false);
 				GameServer()->OnClientEnter(ClientID);
+				ExpireServerInfo();
 			}
 		}
 		else if(Msg == NETMSG_INPUT)

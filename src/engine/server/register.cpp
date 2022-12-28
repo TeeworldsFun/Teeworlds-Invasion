@@ -479,7 +479,6 @@ CRegister::CRegister(IConsole *pConsole, IEngine *pEngine, int ServerPort, unsig
 	str_format(m_aConnlessTokenHex, sizeof(m_aConnlessTokenHex), "%08x", bytes_be_to_uint(aTokenBytes));
 
 	m_pConsole->Chain("sv_register", ConchainOnConfigChange, this);
-	m_pConsole->Chain("sv_sixup", ConchainOnConfigChange, this);
 }
 
 void CRegister::Update()
@@ -639,7 +638,6 @@ bool CRegister::OnPacket(const CNetChunk *pPacket)
 
 void CRegister::OnNewInfo(const char *pInfo)
 {
-	dbg_msg("register", "info: %s", pInfo);
 	if(m_GotServerInfo && str_comp(m_aServerInfo, pInfo) == 0)
 	{
 		return;
