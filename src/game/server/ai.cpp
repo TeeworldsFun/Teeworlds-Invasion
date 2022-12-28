@@ -573,7 +573,7 @@ bool CAI::MoveTowardsWaypoint(int Dist)
 
 void CAI::ReceiveDamage(int CID, int Dmg)
 {
-	if (CID >= 0 && CID < 16)
+	if (CID >= 0 && CID < 64)
 	{
 		m_aAnger[CID] += Dmg;
 		m_aAnger[CID] *= 1.1f;
@@ -586,7 +586,7 @@ void CAI::ReceiveDamage(int CID, int Dmg)
 	else
 	{
 		// world damage
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 64; i++)
 		{
 			m_aAnger[i] += Dmg/2;
 			m_aAnger[i] *= 1.1f;
@@ -601,7 +601,7 @@ void CAI::HandleEmotions()
 {
 	m_TotalAnger = 0.0f;
 	
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		m_aAnger[i] *= 0.97f;
 		m_aAttachment[i] *= 0.97f;
@@ -623,7 +623,7 @@ void CAI::ClearEmotions()
 {
 	m_PanicTick = 0;
 	
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		m_aAnger[i] = 0.0f;
 		m_aAttachment[i] = 0.0f;

@@ -1341,7 +1341,7 @@ void CServer::CacheServerInfo(CCache *pCache, int Type, bool SendClients)
 	}
 	else
 	{
-		if(m_NetServer.MaxClients() <= VANILLA_MAX_CLIENTS)
+		if(m_NetServer.MaxClients() <= MAX_CLIENTS)
 		{
 	p.AddString(g_Config.m_SvName, 64);
 		}
@@ -1372,14 +1372,14 @@ void CServer::CacheServerInfo(CCache *pCache, int Type, bool SendClients)
 	int MaxClientsProtocol = MAX_CLIENTS;
 	if(Type == SERVERINFO_VANILLA || Type == SERVERINFO_INGAME)
 	{
-		if(ClientCount >= VANILLA_MAX_CLIENTS)
+		if(ClientCount >= MAX_CLIENTS)
 		{
 			if(ClientCount < MaxClients)
-				ClientCount = VANILLA_MAX_CLIENTS - 1;
+				ClientCount = MAX_CLIENTS - 1;
 			else
-				ClientCount = VANILLA_MAX_CLIENTS;
+				ClientCount = MAX_CLIENTS;
 		}
-		MaxClientsProtocol = VANILLA_MAX_CLIENTS;
+		MaxClientsProtocol = MAX_CLIENTS;
 		if(PlayerCount > ClientCount)
 			PlayerCount = ClientCount;
 	}
@@ -1435,8 +1435,8 @@ void CServer::CacheServerInfo(CCache *pCache, int Type, bool SendClients)
 	{
 	case SERVERINFO_EXTENDED: Remaining = -1; break;
 	case SERVERINFO_64_LEGACY: Remaining = 24; break;
-	case SERVERINFO_VANILLA: Remaining = VANILLA_MAX_CLIENTS; break;
-	case SERVERINFO_INGAME: Remaining = VANILLA_MAX_CLIENTS; break;
+	case SERVERINFO_VANILLA: Remaining = MAX_CLIENTS; break;
+	case SERVERINFO_INGAME: Remaining = MAX_CLIENTS; break;
 	default: dbg_assert(0, "caught earlier, unreachable"); return;
 	}
 
@@ -2363,7 +2363,7 @@ int main(int argc, const char **argv) // ignore_convention
 void CServer::AddZombie()
 {
 	int ClientID = -1;
-	for (int i = 16; i < MAX_CLIENTS; i++)
+	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		if (m_aClients[i].m_State == CClient::STATE_EMPTY)
 		{

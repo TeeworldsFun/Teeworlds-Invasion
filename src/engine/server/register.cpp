@@ -403,10 +403,7 @@ void CRegister::CProtocol::CJob::Run()
 	}
 	json_value *pJson = m_pRegister->ResultJson();
 	if(!pJson)
-	{
-		dbg_msg(ProtocolToSystem(m_Protocol), "non-JSON response from master");
 		return;
-	}
 	const json_value &Json = *pJson;
 	const json_value &StatusString = Json["status"];
 	if(StatusString.type != json_string)

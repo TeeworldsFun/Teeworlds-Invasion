@@ -42,8 +42,8 @@ protected:
 	bool m_EnemyInLine;
 
 	// emotions
-	float m_aAnger[16]; // MAX_CLIENTS
-	float m_aAttachment[16]; // MAX_CLIENTS
+	float m_aAnger[64]; // MAX_CLIENTS
+	float m_aAttachment[64]; // MAX_CLIENTS
 	
 	float m_TotalAnger;
 	
