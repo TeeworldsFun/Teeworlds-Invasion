@@ -79,6 +79,8 @@ public:
 	CEntity *TypeNext() { return m_pNextTypeEntity; }
 	CEntity *TypePrev() { return m_pPrevTypeEntity; }
 
+	int GetObjType() { return m_ObjType; }
+
 	/*
 		Function: destroy
 			Destorys the entity.

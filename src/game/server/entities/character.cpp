@@ -19,6 +19,8 @@
 #include <game/server/gamemodes/cstt.h>
 #include <game/server/gamemodes/csbb.h>
 
+#include <game/server/playerdata.h>
+
 
 #define RAD 0.017453292519943295769236907684886f
 
@@ -61,6 +63,8 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Health = 0;
 	m_Armor = 0;
 	m_PainSoundTimer = 0;
+
+	m_Spawned = false;
 }
 
 bool CCharacter::Hooking()
@@ -86,6 +90,7 @@ void CCharacter::Reset()
 
 bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 {
+	m_Spawned = true;
 	m_Grenades = 2;
 	m_Recoil = vec2(0, 0);
 	
@@ -1289,6 +1294,41 @@ void CCharacter::GiveStartWeapon()
 {
 	if (g_Config.m_SvRandomWeapons)
 		GiveRandomWeapon();
+
+	if (str_comp(g_Config.m_SvGametype, "coop") == 0)
+	{
+		if (m_IsBot)
+			return;
+
+		// load saved weapons
+		CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetColorID());
+
+		bool GotItems = false;
+
+		for (int i = 0; i < NUM_WEAPONS; i++)
+		{
+			if (pData->m_aWeaponType[i])
+			{
+				GiveCustomWeapon(pData->m_aWeaponType[i]);
+			}
+		}
+
+		if (!GotItems)
+		{
+			GiveCustomWeapon(GUN_UZI);
+			GiveCustomWeapon(GRENADE_GRENADELAUNCHER);
+		}
+		m_Kits = pData->m_Kits;
+		m_Armor = pData->m_Armor;
+		GetPlayer()->m_Score = pData->m_Score;
+		GetPlayer()->m_Gold = pData->m_Gold;
+
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "Data load - color={%d}", GetPlayer()->GetColorID());
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "Character", aBuf);
+
+		return;
+	}
 }
 
 
@@ -1683,12 +1723,13 @@ void CCharacter::SetArmor(int Armor)
 
 bool CCharacter::IncreaseHealth(int Amount)
 {
-	if(m_HiddenHealth >= m_MaxHealth)
+	if (m_HiddenHealth >= m_MaxHealth)
 		return false;
-	m_HiddenHealth = clamp(m_HiddenHealth+Amount, 0, m_MaxHealth);
-	
-	GetPlayer()->m_InterestPoints += 40;
-	
+
+	m_HiddenHealth = clamp(m_HiddenHealth + Amount, 0, m_MaxHealth);
+
+	// GetPlayer()->m_InterestPoints += 40;
+
 	return true;
 }
 
@@ -1750,6 +1791,9 @@ void CCharacter::Die(int Killer, int Weapon, bool SkipKillMessage)
 	//	Weapon = 0;
 	// we got to wait 0.5 secs before respawning
 	//m_pPlayer->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
+
+	SaveData();
+
 	m_pPlayer->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*4;
 	
 	if (Weapon != WEAPON_GAME)
@@ -2084,3 +2128,32 @@ void CCharacter::Snap(int SnappingClient)
 	pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
 }
 
+void CCharacter::Warp()
+{
+	GameServer()->CreatePlayerSpawn(GetPosition());
+	Die(-1, WEAPON_WORLD, true);
+}
+
+void CCharacter::SaveData()
+{
+	if (m_IsBot || !m_Spawned || !str_comp(g_Config.m_SvGametype, "coop") == 0)
+		return;
+
+	CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetColorID());
+
+	pData->m_Kits = m_Kits;
+	pData->m_Armor = m_Armor;
+	pData->m_Score = GetPlayer()->m_Score;
+	pData->m_Gold = GetPlayer()->m_Gold;
+
+	if (g_Config.m_SvMapGenLevel > pData->m_HighestLevel)
+	{
+		pData->m_HighestLevel = g_Config.m_SvMapGenLevel;
+		pData->m_HighestLevelSeed = g_Config.m_SvMapGenSeed;
+	}
+
+	char aBuf[256];
+
+	str_format(aBuf, sizeof(aBuf), "Data save - color={%d}", GetPlayer()->GetColorID());
+	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "Character", aBuf);
+}

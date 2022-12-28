@@ -61,6 +61,7 @@ public:
 	
 	void Init(int CID);
 
+	void SaveData();
 	void NewRound();
 	
 	void TryRespawn();
@@ -68,7 +69,9 @@ public:
 	void SetTeam(int Team, bool DoChatMsg=true);
 	void SetWantedTeam(int Team, bool DoChatMsg=true);
 	int GetTeam() const { return m_Team; };
-	
+
+	int GetColorID();
+
 	/*
 	int GetTeam()
 	{
@@ -143,6 +146,7 @@ public:
 		int m_UseCustomColor;
 		int m_ColorBody;
 		int m_ColorFeet;
+		int m_ColorSkin;
 	} m_TeeInfos;
 	
 	// for shopping system
@@ -188,7 +192,8 @@ public:
 	void AITick();
 	bool AIInputChanged();
 	
-	
+	bool m_ToBeKicked;
+
 	// custom
 	bool BuyableWeapon(int i);
 	void ListBuyableWeapons();
@@ -280,6 +285,12 @@ public:
 		return Size;
 	}
 	
+	int m_Gold;
+	
+	int GetGold() { return m_Gold; }
+	void ReduceGold(int Amount) { m_Gold = max(0, m_Gold-Amount); }
+	bool IncreaseGold(int Amount);
+
 private:
 	bool m_Spectate;
 

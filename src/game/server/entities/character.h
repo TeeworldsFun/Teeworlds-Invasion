@@ -186,10 +186,14 @@ public:
 
 	int m_Kits;
 
+	void Warp();
+
+	void SaveData();
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
 
+	bool m_Spawned;
 	bool m_Alive;
 
 	vec2 m_Recoil;

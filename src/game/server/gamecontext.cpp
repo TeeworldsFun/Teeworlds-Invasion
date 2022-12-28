@@ -25,7 +25,7 @@
 #include <game/server/ai.h>
 
 #include <engine/shared/datafile.h> // MapGen
-
+#include <game/server/playerdata.h>
 
 
 const char *aClassName[NUM_CLASSES] = 
@@ -827,6 +827,29 @@ void CGameContext::OnClientEnter(int ClientID)
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
+	if (str_comp(g_Config.m_SvGametype, "coop") == 0 && g_Config.m_SvMapGen)
+	{
+		switch (g_Config.m_SvInvFails)
+		{
+		case 0:
+			str_format(aBuf, sizeof(aBuf), "Level %d", g_Config.m_SvMapGenLevel);
+			break;
+		
+		case 1:
+			str_format(aBuf, sizeof(aBuf), "Level %d - Second try", g_Config.m_SvMapGenLevel);
+			break;
+		
+		case 2:
+			str_format(aBuf, sizeof(aBuf), "Level %d - Last chance..", g_Config.m_SvMapGenLevel);
+			break;
+		
+		default:
+			str_format(aBuf, sizeof(aBuf), "Level %d - THE END.", g_Config.m_SvMapGenLevel);
+			break;
+		}
+	}
+	SendBroadcast(aBuf, -1, true);
+
 	m_VoteUpdate = true;
 }
 
@@ -1441,6 +1464,8 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pPlayer->m_TeeInfos.m_UseCustomColor = pMsg->m_UseCustomColor;
 			pPlayer->m_TeeInfos.m_ColorBody = pMsg->m_ColorBody;
 			pPlayer->m_TeeInfos.m_ColorFeet = pMsg->m_ColorFeet;
+			pPlayer->m_TeeInfos.m_ColorSkin = pMsg->m_ColorFeet*pMsg->m_ColorBody+((int)pPlayer->m_TeeInfos.m_SkinName[2]);
+
 			m_pController->OnPlayerInfoChange(pPlayer);
 		}
 		else if (MsgID == NETMSGTYPE_CL_EMOTICON && !m_World.m_Paused)
@@ -2099,8 +2124,14 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	else
 		m_pController = new CGameControllerDM(this);
 
-	if (g_Config.m_SvMapGen && !m_pServer->m_MapGenerated && str_comp(g_Config.m_SvGametype, "coop") == 0)
-		GenerateMap();
+	if (g_Config.m_SvMapGen && !m_pServer->m_MapGenerated)
+	{
+		m_MapGen.FillMap();
+		SaveMap("");
+
+		str_copy(g_Config.m_SvMap, "generated", sizeof(g_Config.m_SvMap));
+		m_pServer->m_MapGenerated = true;
+	}
 
 	// setup core world
 	//for(int i = 0; i < MAX_CLIENTS; i++)
@@ -2620,7 +2651,7 @@ void CGameContext::SaveMap(const char *path)
     CDataFileWriter fileWrite;
     char aMapFile[512];
 	//str_format(aMapFile, sizeof(aMapFile), "maps/%s_%d.map", Server()->GetMapName(), g_Config.m_SvMapGenSeed);
-	str_format(aMapFile, sizeof(aMapFile), "maps/Dungeon_S%d_L%d.map", g_Config.m_SvMapGenSeed, g_Config.m_SvMapGenLevel);
+	str_format(aMapFile, sizeof(aMapFile), "maps/generated.map");
 		
 	// Map will be saved to current dir, not to ~/.ninslash/maps or to data/maps, so we need to create a dir for it
 	Storage()->CreateFolder("maps", IStorage::TYPE_SAVE);
@@ -2636,9 +2667,12 @@ void CGameContext::GenerateMap()
 {
 	m_MapGen.FillMap();
 	SaveMap("");
-		
-	char mapName[256];
-	str_format(mapName, sizeof(mapName), "Dungeon_S%d_L%d", g_Config.m_SvMapGenSeed, g_Config.m_SvMapGenLevel);
-	str_copy(g_Config.m_SvMap, mapName, sizeof(g_Config.m_SvMap));
+
+	str_copy(g_Config.m_SvMap, "generated", sizeof(g_Config.m_SvMap));
 	m_pServer->m_MapGenerated = true;
+}
+
+void CGameContext::ReloadMap()
+{
+	Console()->ExecuteLine("reload");
 }

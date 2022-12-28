@@ -28,6 +28,7 @@
 #include <mastersrv/mastersrv.h>
 
 #include <game/server/ai.h>
+#include <game/server/playerdata.h>
 
 
 #include "register.h"
@@ -289,6 +290,8 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 	m_RconAuthLevel = AUTHED_ADMIN;
 
 	m_MapGenerated = false;
+	
+	m_pPlayerData = NULL;
 	
 	Init();
 }
@@ -1270,6 +1273,11 @@ char *CServer::GetMapName()
 
 int CServer::LoadMap(const char *pMapName)
 {
+	if (str_comp(pMapName, "generated") != 0)
+		m_MapGenerated = false;
+	else if (g_Config.m_SvMapGen)
+		str_copy(g_Config.m_SvInvMap, m_aCurrentMap, sizeof(g_Config.m_SvInvMap));
+
 	KickBots();
 	
 	//DATAFILE *df;
@@ -1410,7 +1418,8 @@ int CServer::Run()
 						if(m_aClients[c].m_State <= CClient::STATE_AUTH)
 							continue;
 
-						SendMap(c);
+						if (!g_Config.m_SvMapGen ||  str_comp(g_Config.m_SvMap, "generated") == 0)
+							SendMap(c);
 						
 						m_aClients[c].Reset();
 						m_aClients[c].m_State = CClient::STATE_CONNECTING;
@@ -1947,10 +1956,51 @@ void CServer::AddZombie()
 	SetClientClan(ClientID, "ai");
 }
 
+int CServer::GetHighScore()
+{
+	if (m_pPlayerData)
+		return m_pPlayerData->GetHighScore(1);
+	
+	return 1;
+}
 
+int CServer::GetPlayerCount()
+{
+	if (m_pPlayerData)
+		return m_pPlayerData->GetPlayerCount(0);
+	
+	return 1;
+}
 
-
-
-
-
-
+CPlayerData *CServer::GetPlayerData(int ClientID, int ColorID)
+{
+	if (ClientID < 0 || ClientID >= MAX_CLIENTS)
+		return NULL;
+	
+	/*
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "GetPlayerData: '%s'", m_aClients[ClientID].m_aName);
+	dbg_msg("server", aBuf);
+	*/
+						
+	if (m_pPlayerData)
+	{
+		CPlayerData *pData = m_pPlayerData->Get(m_aClients[ClientID].m_aName, ColorID);
+	
+		if (pData)
+			return pData;
+		else
+		{
+			CPlayerData *pNewData = new CPlayerData(m_aClients[ClientID].m_aName, ColorID);
+			m_pPlayerData->Add(pNewData);
+			return pNewData;
+		}
+	}
+	else
+	{
+		m_pPlayerData = new CPlayerData(m_aClients[ClientID].m_aName, ColorID);
+		return m_pPlayerData;
+	}
+	
+	return NULL;
+}

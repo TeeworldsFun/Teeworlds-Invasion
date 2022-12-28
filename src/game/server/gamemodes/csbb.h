@@ -66,7 +66,7 @@ private:
 	bool m_Timeout;
 	
 	// 
-	class CBomb *m_pBomb; // red flag
+	CBomb *m_pBomb; // red flag
 	class CFlag *m_apBombArea[MAX_BOMBAREAS]; // blue flags
 	int m_BombAreaCount;
 	
@@ -121,7 +121,7 @@ public:
 	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 	void OnCharacterSpawn(class CCharacter *pChr, bool RequestAI = false);
 	
-	class CBomb *GetBomb();
+	CBomb *GetBomb();
 	class CFlag *GetClosestBase(vec2 Pos);
 	
 	bool CanCharacterSpawn(int ClientID);

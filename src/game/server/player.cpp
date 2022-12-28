@@ -65,6 +65,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_Welcomed = false;
 	
 	GameServer()->ResetVotes();
+
+	m_ToBeKicked = false;
 }
 
 CPlayer::~CPlayer()
@@ -542,7 +544,7 @@ void CPlayer::TryRespawn()
 	if(str_comp(g_Config.m_SvGametype, "cstt") == 0)
 		JoinTeam();
 	
-	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos))
+	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos, m_IsBot))
 		return;
 	
 	/*
@@ -801,10 +803,24 @@ bool CPlayer::BuyWeapon(int CustomWeapon)
 	return true;
 }
 
+void CPlayer::SaveData()
+{
+	if (GetCharacter())
+		GetCharacter()->SaveData();
+}
 
+int CPlayer::GetColorID()
+{
+	return m_TeeInfos.m_ColorSkin;
+}
 
+bool CPlayer::IncreaseGold(int Amount)
+{
+	if (m_Gold < 999)
+	{
+		m_Gold = min(999, m_Gold+Amount);
+		return true;
+	}
 
-
-
-
-
+	return false;
+}

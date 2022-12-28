@@ -160,8 +160,9 @@ public:
 	
 	virtual void ReceiveDamage(int CID, int Dmg);
 
-	
 	int GetMove(){ return m_Move; }
+
+	void Trigger(int TriggerLevel);
 };
 
 

@@ -4,6 +4,8 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
+#include <game/server/entities/bomb.h>
+#include "entities/flag.h"
 
 #define MAX_PICKUPS 1024
 #define MAX_DROPPABLES 50
@@ -36,7 +38,7 @@ class IGameController
 	
 protected:
 
-
+	void DeathMessage();
 	void AutoBalance();
 	
 	void RespawnPickups();
@@ -71,6 +73,7 @@ protected:
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type);
 	bool EvaluateSpawn(class CPlayer *pP, vec2 *pPos);
 
+	void FirstMap();
 	void CycleMap();
 	void ResetGame();
 
@@ -182,10 +185,10 @@ public:
 
 	virtual bool CanCharacterSpawn(int ClientID);
 
-	virtual class CBomb *GetBomb();
-	virtual class CFlag *GetClosestBase(vec2 Pos, int Team = -1);
-	virtual class CFlag *GetRandomBase(int NotThisTeam = -1);
-	virtual class CFlag *GetUndefendedBase(int Team = -1);
+	virtual CBomb *GetBomb();
+	virtual CFlag *GetClosestBase(vec2 Pos, int Team = -1);
+	virtual CFlag *GetRandomBase(int NotThisTeam = -1);
+	virtual CFlag *GetUndefendedBase(int Team = -1);
 	virtual int Defenders(class CFlag *Base);
 	
 	virtual int CountBases(int Team = -1);
@@ -193,7 +196,7 @@ public:
 	virtual void OnPlayerInfoChange(class CPlayer *pP);
 
 	//
-	virtual bool CanSpawn(int Team, vec2 *pPos);
+	virtual bool CanSpawn(int Team, vec2 *pPos, bool IsBot = false);
 
 	/*
 
@@ -208,6 +211,18 @@ public:
 	virtual void PostReset();
 	
 	virtual void DropPickup(vec2 Pos, int PickupType, int PickupSubtype = -1);
+
+	int GetAliveCID(int Team = -1);
+	int CountPlayersAlive(int Team = -1, bool IgnoreBots = false);
+	int CountPlayers(int Team = -1);
+	int CountHumans();
+	int CountBots();
+	int CountBotsAlive();
+
+	void TriggerSwitch(vec2 Pos);
+	void TriggerEscape();
+	virtual void DisplayExit(vec2 Pos);
+	virtual void NextLevel(int CID = -1);
 };
 
 #endif

@@ -90,6 +90,8 @@ public:
 
 	void Clear();
 
+	void ReloadMap();
+
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
 

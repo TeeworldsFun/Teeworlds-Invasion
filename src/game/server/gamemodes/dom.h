@@ -23,9 +23,9 @@ private:
 public:
 	CGameControllerDOM(class CGameContext *pGameServer);
 
-	class CFlag *GetClosestBase(vec2 Pos, int Team = -1);
-	class CFlag *GetUndefendedBase(int Team = -1);
-	class CFlag *GetRandomBase(int NotThisTeam = -1);
+	CFlag *GetClosestBase(vec2 Pos, int Team = -1);
+	CFlag *GetUndefendedBase(int Team = -1);
+	CFlag *GetRandomBase(int NotThisTeam = -1);
 	int Defenders(class CFlag *Base);
 	
 	int CountBases(int Team = -1);

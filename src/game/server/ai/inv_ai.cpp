@@ -8,7 +8,7 @@
 #include <base/math.h>
 #include "inv_ai.h"
 
-CAIinvasion::CAIinvasion(CGameContext *pGameServer, CPlayer *pPlayer, int Level)
+CAIinvasion::CAIinvasion(CGameContext *pGameServer, CPlayer *pPlayer, int Level, int Group)
 	: CAI(pGameServer, pPlayer)
 {
 	m_SkipMoveUpdate = 0;
@@ -23,6 +23,10 @@ CAIinvasion::CAIinvasion(CGameContext *pGameServer, CPlayer *pPlayer, int Level)
 	m_AttackOnDamageTick = 0;
 
 	m_MoveReactTime = 0;
+
+	m_Group = Group;
+
+	pPlayer->SetRandomSkin();
 }
 
 void CAIinvasion::GiveWeapon(CCharacter *pChr, int W)
@@ -60,7 +64,7 @@ void CAIinvasion::OnCharacterSpawn(CCharacter *pChr)
 		break;
 
 	case SKIN_ALIEN2:
-		GiveWeapon(pChr, SWORD_LIGHTNING);
+		GiveWeapon(pChr, SHOTGUN_DOUBLEBARREL);
 		pChr->SetHealth(60 + min((m_Level - 1) * 4, 300));
 		pChr->SetArmor(60 + min((m_Level - 1) * 4, 300));
 		m_PowerLevel = 8;
@@ -230,6 +234,8 @@ void CAIinvasion::OnCharacterSpawn(CCharacter *pChr)
 		break;
 	}
 
+	m_PowerLevel *= 2;
+
 	if (!m_Triggered)
 		m_ReactionTime = 100;
 }
@@ -270,6 +276,7 @@ void CAIinvasion::DoBehavior()
 		if (ShootAtClosestEnemy())
 		{
 			Shooting = true;
+			ReactToPlayer();
 
 			if (WeaponShootRange() - m_PlayerDistance > 200)
 			{
@@ -322,9 +329,33 @@ void CAIinvasion::DoBehavior()
 			}
 		}
 	}
+	
+	HeadToMovingDirection();
+
+	SeekClosestEnemyInSight();
+	
+	if (UpdateWaypoint())
+	{
+		MoveTowardsWaypoint(40);
+		HookMove();
+		AirJump();
+		
+		// jump if waypoint is above us
+		if (abs(m_WaypointPos.x - m_Pos.x) < 60 && m_WaypointPos.y < m_Pos.y - 100 && frandom()*20 < 4)
+			m_Jump = 1;
+	}
+	else
+	{
+		m_Hook = 0;
+	}
+	
+	
+	DoJumping();
+	Unstuck();
 
 	RandomlyStopShooting();
 
 	// next reaction in
 	m_ReactionTime = 1 + rand() % 3;
+	
 }

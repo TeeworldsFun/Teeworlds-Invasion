@@ -64,10 +64,16 @@ class CServer : public IServer
 	class IGameServer *m_pGameServer;
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
+
+	class CPlayerData *m_pPlayerData;
 public:
 	class IGameServer *GameServer() { return m_pGameServer; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
+
+	class CPlayerData *GetPlayerData(int ClientID, int ColorID);
+	int GetHighScore();
+	int GetPlayerCount();
 
 	enum
 	{

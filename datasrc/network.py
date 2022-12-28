@@ -188,16 +188,6 @@ Objects = [
 		NetIntAny("m_Y"),
 	]),
 
-	NetObject("DDNetLaser", [
-		NetIntAny("m_ToX"),
-		NetIntAny("m_ToY"),
-		NetIntAny("m_FromX"),
-		NetIntAny("m_FromY"),
-		NetTick("m_StartTick"),
-		NetIntRange("m_Owner", 0, 'MAX_CLIENTS-1'),
-		NetIntAny("m_Type"),
-	]),
-
 	## Events
 
 	NetEvent("Common", [
@@ -224,6 +214,16 @@ Objects = [
 
 	NetEvent("DamageInd:Common", [
 		NetIntAny("m_Angle"),
+	]),
+
+	NetObject("DDNetLaser", [
+		NetIntAny("m_ToX"),
+		NetIntAny("m_ToY"),
+		NetIntAny("m_FromX"),
+		NetIntAny("m_FromY"),
+		NetTick("m_StartTick"),
+		NetIntRange("m_Owner", 0, 'MAX_CLIENTS-1'),
+		NetIntAny("m_Type"),
 	]),
 ]
 

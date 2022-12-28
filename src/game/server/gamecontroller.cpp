@@ -12,6 +12,7 @@
 #include "gamecontroller.h"
 #include "gamecontext.h"
 
+#include "entities/door.h"
 
 IGameController::IGameController(class CGameContext *pGameServer)
 {
@@ -134,51 +135,51 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
 void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type)
 {
 	// get random spawn point
-	
-	//for(int i = 0; i < m_aNumSpawnPoints[Type]; i++)
-	
+
+	// for(int i = 0; i < m_aNumSpawnPoints[Type]; i++)
+
 	// let's start with a random instead
-	int i = frandom()*m_aNumSpawnPoints[Type];
+	int i = frandom() * m_aNumSpawnPoints[Type];
 	for (int c = 0; c < m_aNumSpawnPoints[Type]; c++)
-	{	
+	{
 		i++;
 		if (i >= m_aNumSpawnPoints[Type])
 			i = 0;
-	
+
 		// check if the position is occupado
 		CCharacter *aEnts[MAX_CLIENTS];
-		int Num = GameServer()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };	// start, left, up, right, down
+		int Num = GameServer()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity **)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+		vec2 Positions[5] = {vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f)}; // start, left, up, right, down
 		int Result = -1;
-		for(int Index = 0; Index < 5 && Result == -1; ++Index)
+		for (int Index = 0; Index < 5 && Result == -1; ++Index)
 		{
 			Result = Index;
-			for(int c = 0; c < Num; ++c)
-				if(GameServer()->Collision()->CheckPoint(m_aaSpawnPoints[Type][i]+Positions[Index]) ||
-					distance(aEnts[c]->m_Pos, m_aaSpawnPoints[Type][i]+Positions[Index]) <= aEnts[c]->m_ProximityRadius)
+			for (int c = 0; c < Num; ++c)
+				if (GameServer()->Collision()->CheckPoint(m_aaSpawnPoints[Type][i] + Positions[Index]) ||
+					distance(aEnts[c]->m_Pos, m_aaSpawnPoints[Type][i] + Positions[Index]) <= aEnts[c]->m_ProximityRadius)
 				{
 					Result = -1;
 					break;
 				}
 		}
-		if(Result == -1)
-			continue;	// try next spawn point
+		if (Result == -1)
+			continue; // try next spawn point
 
-		vec2 P = m_aaSpawnPoints[Type][i]+Positions[Result];
+		vec2 P = m_aaSpawnPoints[Type][i] + Positions[Result];
 		float S = EvaluateSpawnPos(pEval, P);
-		if(!pEval->m_Got || pEval->m_Score > S)
+		if (!pEval->m_Got || pEval->m_Score > S)
 		{
 			pEval->m_Got = true;
 			pEval->m_Score = S;
 			pEval->m_Pos = P;
-			
+
 			// let's be happy with the first one popping up
 			break;
 		}
 	}
 }
 
-bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
+bool IGameController::CanSpawn(int Team, vec2 *pOutPos, bool Bot)
 {
 	CSpawnEval Eval;
 
@@ -508,30 +509,22 @@ void IGameController::ChangeMap(const char *pToMap)
 
 void IGameController::CycleMap()
 {
-	if (str_comp(g_Config.m_SvGametype, "coop") == 0)
-	{
-		g_Config.m_SvMapGenSeed = rand()%400+1;
-		g_Config.m_SvMapGenLevel = rand()%400+1;
-
-		GameServer()->GenerateMap();
-		return;
-	}
-	if(m_aMapWish[0] != 0)
+	if (m_aMapWish[0] != 0)
 	{
 		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "rotating map to %s", m_aMapWish);
+		str_format(aBuf, sizeof(aBuf), "rotating map to {%s}", m_aMapWish);
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 		str_copy(g_Config.m_SvMap, m_aMapWish, sizeof(g_Config.m_SvMap));
 		m_aMapWish[0] = 0;
 		m_RoundCount = 0;
 		return;
 	}
-	if(!str_length(g_Config.m_SvMaprotation))
+	if (!str_length(g_Config.m_SvMaprotation))
 		return;
 
-	if(m_RoundCount < g_Config.m_SvRoundsPerMap-1)
+	if (m_RoundCount < g_Config.m_SvRoundsPerMap - 1)
 	{
-		if(g_Config.m_SvRoundSwap)
+		if (g_Config.m_SvRoundSwap)
 			GameServer()->SwapTeams();
 		return;
 	}
@@ -540,19 +533,22 @@ void IGameController::CycleMap()
 	const char *pMapRotation = g_Config.m_SvMaprotation;
 	const char *pCurrentMap = g_Config.m_SvMap;
 
+	if (strcmp(g_Config.m_SvMap, "generated") == 0)
+		pCurrentMap = g_Config.m_SvInvMap;
+
 	int CurrentMapLen = str_length(pCurrentMap);
 	const char *pNextMap = pMapRotation;
-	while(*pNextMap)
+	while (*pNextMap)
 	{
 		int WordLen = 0;
-		while(pNextMap[WordLen] && !IsSeparator(pNextMap[WordLen]))
+		while (pNextMap[WordLen] && !IsSeparator(pNextMap[WordLen]))
 			WordLen++;
 
-		if(WordLen == CurrentMapLen && str_comp_num(pNextMap, pCurrentMap, CurrentMapLen) == 0)
+		if (WordLen == CurrentMapLen && str_comp_num(pNextMap, pCurrentMap, CurrentMapLen) == 0)
 		{
 			// map found
 			pNextMap += CurrentMapLen;
-			while(*pNextMap && IsSeparator(*pNextMap))
+			while (*pNextMap && IsSeparator(*pNextMap))
 				pNextMap++;
 
 			break;
@@ -562,15 +558,15 @@ void IGameController::CycleMap()
 	}
 
 	// restart rotation
-	if(pNextMap[0] == 0)
+	if (pNextMap[0] == 0)
 		pNextMap = pMapRotation;
 
 	// cut out the next map
 	char aBuf[512] = {0};
-	for(int i = 0; i < 511; i++)
+	for (int i = 0; i < 511; i++)
 	{
 		aBuf[i] = pNextMap[i];
-		if(IsSeparator(pNextMap[i]) || pNextMap[i] == 0)
+		if (IsSeparator(pNextMap[i]) || pNextMap[i] == 0)
 		{
 			aBuf[i] = 0;
 			break;
@@ -579,13 +575,13 @@ void IGameController::CycleMap()
 
 	// skip spaces
 	int i = 0;
-	while(IsSeparator(aBuf[i]))
+	while (IsSeparator(aBuf[i]))
 		i++;
 
 	m_RoundCount = 0;
 
 	char aBufMsg[256];
-	str_format(aBufMsg, sizeof(aBufMsg), "rotating map to %s", &aBuf[i]);
+	str_format(aBufMsg, sizeof(aBufMsg), "rotating map to {%s}", &aBuf[i]);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	str_copy(g_Config.m_SvMap, &aBuf[i], sizeof(g_Config.m_SvMap));
 }
@@ -671,7 +667,10 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 void IGameController::OnCharacterSpawn(class CCharacter *pChr, bool RequestAI)
 {	
 	// default health
-	pChr->SetHealth(100);
+	if (!RequestAI)
+		pChr->SetHealth(500);
+	else
+		pChr->SetHealth(100);
 
 	if (g_Config.m_SvHammerFight)
 	{
@@ -791,6 +790,8 @@ void IGameController::Tick()
 			CycleMap();
 			GameServer()->SwapTeams();
 			StartRound();
+			if (g_Config.m_SvMapGenRandSeed)
+				g_Config.m_SvMapGenSeed = rand() % 32767;
 			m_RoundCount++;
 		}
 	}
@@ -1089,4 +1090,271 @@ int IGameController::ClampTeam(int Team)
 	if(IsTeamplay())
 		return Team&1;
 	return 0;
+}
+
+int IGameController::CountHumans()
+{
+	int Num = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (!pPlayer->m_IsBot)
+			Num++;
+	}
+
+	return Num;
+}
+
+int IGameController::CountPlayers(int Team)
+{
+	int Num = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->GetTeam() != TEAM_SPECTATORS)
+		{
+			if (pPlayer->GetTeam() == Team || Team == -1)
+				Num++;
+		}
+	}
+
+	return Num;
+}
+
+int IGameController::CountPlayersAlive(int Team, bool IgnoreBots)
+{
+	int Num = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->GetTeam() != TEAM_SPECTATORS)
+		{
+			if (pPlayer->GetTeam() == Team || Team == -1)
+			{
+				if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive() && (!IgnoreBots || !pPlayer->m_IsBot))
+					Num++;
+			}
+		}
+	}
+
+	return Num;
+}
+
+int IGameController::GetAliveCID(int Team)
+{
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->GetTeam() != TEAM_SPECTATORS)
+		{
+			if (pPlayer->GetTeam() == Team || Team == -1)
+			{
+				if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
+					return i;
+			}
+		}
+	}
+
+	return -1;
+}
+
+int IGameController::CountBots()
+{
+	int Num = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->m_IsBot)
+			Num++;
+	}
+
+	return Num;
+}
+
+int IGameController::CountBotsAlive()
+{
+	int Num = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->m_IsBot && pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
+			Num++;
+	}
+
+	return Num;
+}
+
+void IGameController::TriggerSwitch(vec2 Pos)
+{
+	TriggerEscape();
+
+	/* Don't need it anymore.
+	if (str_comp(g_Config.m_SvGametype, "coop") == 0 && g_Config.m_SvMapGenLevel % 10 == 9)
+	{
+		m_SurvivalStartTick = Server()->Tick();
+		g_Config.m_SvSurvivalTime = 10;
+	}
+
+
+	float Radius = 1000;
+
+	CBuilding *apEnts[99];
+	int Num = GameServer()->m_World.FindEntities(Pos, Radius, (CEntity**)apEnts,
+													99, CGameWorld::ENTTYPE_BUILDING);
+	for (int i = 0; i < Num; ++i)
+	{
+		CBuilding *pTarget = apEnts[i];
+		pTarget->Trigger();
+	}
+	*/
+}
+
+void IGameController::DisplayExit(vec2 Pos)
+{
+}
+
+void IGameController::TriggerEscape()
+{
+	float Radius = 1000000;
+
+	CEntity *apEnts[999];
+	int Num = GameServer()->m_World.FindEntities(vec2(4000, 4000), Radius, (CEntity **)apEnts,
+												 999, CGameWorld::ENTTYPE_DOOR);
+	for (int i = 0; i < Num; ++i)
+	{
+		CEntity *pTarget = apEnts[i];
+		if (pTarget->GetObjType() == CGameWorld::ENTTYPE_DOOR)
+			DisplayExit(pTarget->m_Pos);
+	}
+}
+
+void IGameController::NextLevel(int CID)
+{
+	//
+}
+
+void IGameController::DeathMessage()
+{
+	GameServer()->CreateSoundGlobal(SOUND_CTF_DROP);
+
+	switch (rand() % 5)
+	{
+	case 0:
+		GameServer()->SendBroadcast("All hope is lost", -1);
+		break;
+	case 1:
+		GameServer()->SendBroadcast("Slaughter", -1);
+		break;
+	case 2:
+		GameServer()->SendBroadcast("Ocean of blood", -1);
+		break;
+	case 3:
+		GameServer()->SendBroadcast("Death takes all", -1);
+		break;
+	default:
+		GameServer()->SendBroadcast("Everybody dies", -1);
+		break;
+	};
+}
+
+void IGameController::FirstMap()
+{
+	g_Config.m_SvMapGenLevel = 1;
+	g_Config.m_SvInvFails = 0;
+
+	if (m_aMapWish[0] != 0)
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "rotating map to {%s}", m_aMapWish);
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		str_copy(g_Config.m_SvMap, m_aMapWish, sizeof(g_Config.m_SvMap));
+		m_aMapWish[0] = 0;
+		m_RoundCount = 0;
+		return;
+	}
+	if (!str_length(g_Config.m_SvMaprotation))
+		return;
+
+	if (m_RoundCount < g_Config.m_SvRoundsPerMap - 1)
+	{
+		if (g_Config.m_SvRoundSwap)
+			GameServer()->SwapTeams();
+		return;
+	}
+
+	// handle maprotation
+	const char *pMapRotation = g_Config.m_SvMaprotation;
+	const char *pCurrentMap = g_Config.m_SvMap;
+
+	int CurrentMapLen = str_length(pCurrentMap);
+	const char *pNextMap = pMapRotation;
+	while (*pNextMap)
+	{
+		int WordLen = 0;
+		while (pNextMap[WordLen] && !IsSeparator(pNextMap[WordLen]))
+			WordLen++;
+
+		if (WordLen == CurrentMapLen && str_comp_num(pNextMap, pCurrentMap, CurrentMapLen) == 0)
+		{
+			// map found
+			pNextMap += CurrentMapLen;
+			while (*pNextMap && IsSeparator(*pNextMap))
+				pNextMap++;
+
+			break;
+		}
+
+		pNextMap++;
+	}
+
+	// restart rotation
+	// if(pNextMap[0] == 0)
+	pNextMap = pMapRotation;
+
+	// cut out the next map
+	char aBuf[512] = {0};
+	for (int i = 0; i < 511; i++)
+	{
+		aBuf[i] = pNextMap[i];
+		if (IsSeparator(pNextMap[i]) || pNextMap[i] == 0)
+		{
+			aBuf[i] = 0;
+			break;
+		}
+	}
+
+	// skip spaces
+	int i = 0;
+	while (IsSeparator(aBuf[i]))
+		i++;
+
+	m_RoundCount = 0;
+
+	char aBufMsg[256];
+	str_format(aBufMsg, sizeof(aBufMsg), "restarting map rotating to {%s}", &aBuf[i]);
+	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+	str_copy(g_Config.m_SvMap, &aBuf[i], sizeof(g_Config.m_SvMap));
 }

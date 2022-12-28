@@ -678,29 +678,33 @@ bool CAI::ShootAtClosestEnemy()
 {
 	CCharacter *pClosestCharacter = NULL;
 	int ClosestDistance = 0;
-	
+	int Weapon = Player()->GetCharacter()->GetActiveWeapon();
+
 	m_EnemyInLine = false;
 
 	// FIRST_BOT_ID, fix
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
-		if(!pPlayer)
+		if (!pPlayer)
 			continue;
-		
+
 		if (pPlayer == Player())
 			continue;
-		
+
 		if (pPlayer->GetTeam() == Player()->GetTeam() && GameServer()->m_pController->IsTeamplay())
 			continue;
 
 		CCharacter *pCharacter = pPlayer->GetCharacter();
 		if (!pCharacter)
 			continue;
-		
+
 		if (!pCharacter->IsAlive())
 			continue;
-			
+
+		if (str_comp(g_Config.m_SvGametype, "coop") == 0 && pCharacter->m_IsBot)
+			continue;
+
 		int Distance = distance(pCharacter->m_Pos, m_LastPos);
 		if (Distance < 800 &&
 			!GameServer()->Collision()->FastIntersectLine(pCharacter->m_Pos, m_LastPos))
@@ -728,31 +732,47 @@ bool CAI::ShootAtClosestEnemy()
 			}
 		}
 	}
-	
-	if (pClosestCharacter && ClosestDistance < WeaponShootRange()*1.2f)
+
+	//if (GetWeaponFiringType(Weapon) != WFT_NONE)
 	{
-		vec2 AttackDirection = vec2(m_PlayerDirection.x+ClosestDistance*(frandom()*0.3f-frandom()*0.3f), m_PlayerDirection.y+ClosestDistance*(frandom()*0.3f-frandom()*0.3f));
-		
-		if (m_HookTick < GameServer()->Server()->Tick() - 20)
-			m_Direction = AttackDirection;
-		
-		// shooting part
-		if (m_AttackTimer++ > max(0, 20 - m_PowerLevel))
+		if (pClosestCharacter && ClosestDistance < WeaponShootRange() * 1.2f)
 		{
-			if (ClosestDistance < WeaponShootRange() && abs(atan2(m_Direction.x, m_Direction.y) - atan2(AttackDirection.x, AttackDirection.y)) < PI / 4.0f)
+			vec2 AttackDirection = vec2(m_PlayerDirection.x + ClosestDistance * (frandom() * 0.2f - frandom() * 0.2f), m_PlayerDirection.y + ClosestDistance * (frandom() * 0.2f - frandom() * 0.2f));
+
+			m_Direction = AttackDirection;
+			m_Hook = 0;
+
+			// shooting part
+			if (m_AttackTimer++ > max(0, 20 - m_PowerLevel))
 			{
-				m_Attack = 1;
-				if (frandom()*30 < 2 && !Player()->GetCharacter()->UsingMeleeWeapon())
-					m_DontMoveTick = GameServer()->Server()->Tick() + GameServer()->Server()->TickSpeed()*(1+frandom());
+				if (ClosestDistance < WeaponShootRange() && abs(atan2(m_Direction.x, m_Direction.y) - atan2(AttackDirection.x, AttackDirection.y)) < PI / 4.0f)
+				{
+					m_Attack = 1;
+
+					if (m_PowerLevel < 14)
+						if (frandom() * 30 < 4 && WeaponShootRange() > 200 && Player()->GetCharacter()->IsGrounded())
+							m_DontMoveTick = GameServer()->Server()->Tick() + GameServer()->Server()->TickSpeed() * (1 + frandom() - m_PowerLevel * 0.1f);
+				}
+
+				/*
+				if (WeaponShootRange() < 300 && m_PowerLevel >= 10)
+					m_Hook = 1;
+				*/
 			}
+
+			return true;
 		}
 	}
-		
-	Player()->GetCharacter()->AutoWeaponChange();
-
-	return true;
+	/*
+	else
+	{
+		//m_TargetPos = m_Pos + m_PlayerDirection * 20;
+		//GameServer()->Collision()->IntersectLine(m_Pos, m_TargetPos, 0x0, &m_TargetPos);
+		return true;
+	}
+	*/
+	return false;
 }
-
 
 void CAI::RandomlyStopShooting()
 {
@@ -1034,5 +1054,11 @@ void CAI::Tick()
 	m_DisplayDirection.y += (m_Direction.y - m_DisplayDirection.y) / 4.0f;
 }
 
-
-
+void CAI::Trigger(int TriggerLevel)
+{
+	if (TriggerLevel >= m_TriggerLevel)
+	{
+		m_Triggered = true;
+		m_ReactionTime = 1;
+	}
+}

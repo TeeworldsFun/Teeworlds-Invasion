@@ -6,17 +6,26 @@
 class CDoor : public CEntity
 {
 public:
-	CDoor(CGameWorld *pGameWorld, vec2 From, vec2 To, int Life);
+	enum
+	{
+		NUM_SIDE = 12,
+		NUM_PARTICLES = 12,
+		NUM_IDS = NUM_SIDE + NUM_PARTICLES,
+	};
 
+public:
+	CDoor(CGameWorld *pGameWorld, vec2 Pos);
+	~CDoor();
 	virtual void Reset();
 	virtual void Tick();
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
 
-	vec2 m_From;
+	bool m_Active;
 
 private:
-	int m_Life;
+	int m_IDs[NUM_IDS];
+	int m_aIDs[NUM_IDS];
 };
 
 #endif

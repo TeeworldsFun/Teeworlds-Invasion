@@ -143,6 +143,10 @@ MACRO_CONFIG_INT(SvMapGenLevel, sv_mapgen_level, 1, 1, 9999, CFGFLAG_SERVER, "Ma
 MACRO_CONFIG_INT(SvMapGenSeed, sv_mapgen_seed, 0, 0, 32767, CFGFLAG_SERVER, "Map generation seed")
 MACRO_CONFIG_INT(SvMapGenRandSeed, sv_mapgen_random_seed, 1, 0, 1, CFGFLAG_SERVER, "Random map generation seed")
 
+// Invasion
+MACRO_CONFIG_INT(SvInvFails, sv_inv_fails,  0, 0, 9, CFGFLAG_SERVER, "Invasion level fails")
+MACRO_CONFIG_INT(SvInvBosses, sv_inv_bosses,  0, 0, 99, CFGFLAG_SERVER, "Invasion level bosses")
+MACRO_CONFIG_STR(SvInvMap, sv_dont_use_j92tka9j, 128, "", CFGFLAG_SERVER, "Latest invasion map")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
