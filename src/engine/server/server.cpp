@@ -357,7 +357,7 @@ void CServer::SetClientName(int ClientID, const char *pName)
 	char aCleanName[MAX_NAME_LENGTH];
 	str_copy(aCleanName, pName, sizeof(aCleanName));
 
-	if(TrySetClientName(ClientID, aCleanName))
+	if(TrySetClientName(ClientID, aCleanName) && !m_aClients[ClientID].m_Bot)
 	{
 		// auto rename
 		for(int i = 1;; i++)
@@ -532,7 +532,7 @@ bool CServer::ClientIngame(int ClientID)
 
 int CServer::MaxClients() const
 {
-	return m_NetServer.MaxClients();
+	return MAX_CLIENTS;
 }
 
 static inline bool RepackMsg(const CMsgPacker *pMsg, CPacker &Packer, bool Sixup)
@@ -1946,7 +1946,7 @@ int CServer::Run()
 				NewTicks++;
 
 				// apply new input
-				for(int c = 0; c < g_Config.m_SvMaxClients; c++)
+				for(int c = 0; c < MAX_CLIENTS; c++)
 				{
 					if(m_aClients[c].m_State != CClient::STATE_INGAME)
 						continue;
@@ -2477,10 +2477,15 @@ void CServer::AddZombie()
 	
 	
 	char aName[128];
-	str_format(aName, sizeof(aName), "%s%s", aName1, aName2);
-	
-	SetClientName(ClientID, aName);
-	SetClientClan(ClientID, "ai");
+	if (str_comp(g_Config.m_SvGametype, "coop") != 0)
+	{
+		str_format(aName, sizeof(aName), "%s%s", aName1, aName2);
+		SetClientName(ClientID, aName);
+	}
+	else
+		SetClientName(ClientID, "  ");
+
+	SetClientClan(ClientID, "AI");
 }
 
 int CServer::GetHighScore()

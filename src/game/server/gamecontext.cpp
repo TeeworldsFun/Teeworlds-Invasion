@@ -659,6 +659,12 @@ void CGameContext::OnTick()
 		{
 			m_apPlayers[i]->Tick();
 			m_apPlayers[i]->PostTick();
+			if (m_apPlayers[i]->m_ShowWelcomMotd && Server()->Tick()%100 == 0)
+			{
+				CNetMsg_Sv_Motd Msg;
+				Msg.m_pMessage = g_Config.m_SvWelcomeMsg;
+				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
+			}
 		}
 	}
 
@@ -1323,15 +1329,18 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
-			if(!m_VoteCloseTime)
+			CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
+			if(!pMsg->m_Vote)
 				return;
 
-			if(pPlayer->m_Vote == 0)
-			{
-				CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
-				if(!pMsg->m_Vote)
-					return;
+			if (m_VoteCloseTime && pPlayer->m_Vote == 1)
+				pPlayer->PressVote(pMsg->m_Vote);
 
+			if (!m_VoteCloseTime)
+				pPlayer->PressVote(pMsg->m_Vote);
+
+			if(pPlayer->m_Vote == 0 && m_VoteCloseTime)
+			{
 				pPlayer->m_Vote = pMsg->m_Vote;
 				pPlayer->m_VotePos = ++m_VotePos;
 				m_VoteUpdate = true;
@@ -2625,19 +2634,6 @@ void CGameContext::KickBot(int ClientID)
 
 void CGameContext::AddBot()
 {
-	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding a bot...");
-
-	/*
-	// find first free slot
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(!m_apPlayers[i])
-		{
-			Server()->AddZombie(i);
-			return;
-		}
-	}
-	*/
 	Server()->AddZombie();
 }
 

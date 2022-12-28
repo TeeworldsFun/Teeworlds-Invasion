@@ -58,12 +58,6 @@ CGameControllerCoop::CGameControllerCoop(class CGameContext *pGameServer)
 	g_Config.m_SvWarmup = 0;
 	g_Config.m_SvTimelimit = 0;
 	g_Config.m_SvScorelimit = 0;
-
-	for (int i = 0; i < MAX_CLIENTS; i++)
-		new CRadar(&GameServer()->m_World, RADAR_HUMAN, i);
-
-	m_pDoor = new CRadar(&GameServer()->m_World, RADAR_DOOR);
-	m_pEnemySpawn = new CRadar(&GameServer()->m_World, RADAR_ENEMY);
 }
 
 bool CGameControllerCoop::OnEntity(int Index, vec2 Pos)
@@ -142,7 +136,7 @@ vec2 CGameControllerCoop::GetBotSpawnPos()
 void CGameControllerCoop::RandomGroupSpawnPos()
 {
 	m_GroupSpawnPos = m_aEnemySpawnPos[rand() % m_NumEnemySpawnPos];
-	m_pEnemySpawn->Activate(m_GroupSpawnPos, Server()->Tick() + Server()->TickSpeed() * 5);
+	//GameServer()->m_pArrow;
 }
 
 bool CGameControllerCoop::CanSpawn(int Team, vec2 *pOutPos, bool IsBot)
@@ -241,7 +235,7 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 	m_EnemiesLeft = 20;
 	m_GroupSpawnTick = 0;
 
-	GameServer()->SendBroadcast("Wave incoming!", -1);
+	GameServer()->SendBroadcast("Wave incoming!", -1, true);
 
 	g_Config.m_SvInvBosses = 1;
 
@@ -260,6 +254,7 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 
 		for (int i = 0; i < m_EnemiesLeft && GameServer()->m_pController->CountBots() < 32; i++)
 			GameServer()->AddBot();
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding bots...");
 	}
 
 	m_Deaths = m_EnemiesLeft;
@@ -269,7 +264,7 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 
 void CGameControllerCoop::DisplayExit(vec2 Pos)
 {
-	m_pDoor->Activate(Pos);
+	//m_pDoor->Activate(Pos);
 }
 
 int CGameControllerCoop::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
@@ -283,14 +278,14 @@ int CGameControllerCoop::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 			if (m_GroupsLeft <= 0)
 			{
 				TriggerEscape();
-				GameServer()->SendBroadcast("Level cleared!", -1);
+				GameServer()->SendBroadcast("Level cleared!", -1, true);
 				m_pExit->m_Active = true;
 			}
 			else if (!m_GroupSpawnTick)
 			{
 				m_GroupSpawnTick = Server()->Tick() + Server()->TickSpeed() * 7;
 				if (m_Group > 1)
-					GameServer()->SendBroadcast("Wave cleared!", -1);
+					GameServer()->SendBroadcast("Wave cleared!", -1, true);
 			}
 		}
 
@@ -353,6 +348,7 @@ void CGameControllerCoop::Tick()
 			m_GameState = STATE_GAME;
 			for (int i = 0; i < m_EnemiesLeft && GameServer()->m_pController->CountBots() < 32; i++)
 				GameServer()->AddBot();
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding bots...");
 		}
 		// reset to first map if there's no players for 60 seconds
 		else if ((m_AutoRestart || g_Config.m_SvMapGenLevel > 1) && Server()->Tick() > Server()->TickSpeed() * 60.0f)

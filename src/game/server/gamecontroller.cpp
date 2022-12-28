@@ -256,6 +256,7 @@ void IGameController::AutoBalance()
 		// add bots
 		if (Players + Bots < g_Config.m_SvPreferredTeamSize)
 		{
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding bots...");
 			GameServer()->AddBot();
 		}
 		
@@ -322,8 +323,10 @@ void IGameController::AutoBalance()
 
 		// not enough players
 		if ((Red+RedBots) < g_Config.m_SvPreferredTeamSize || (Blue+BlueBots) < g_Config.m_SvPreferredTeamSize)
+		{
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding bots...");
 			GameServer()->AddBot();
-
+		}
 		
 		// unbalanced teams
 		if (Red+RedBots > Blue+BlueBots && Red+RedBots > g_Config.m_SvPreferredTeamSize && RedBots > 0)

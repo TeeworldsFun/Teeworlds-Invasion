@@ -293,6 +293,9 @@ public:
 	void ReduceGold(int Amount) { m_Gold = max(0, m_Gold-Amount); }
 	bool IncreaseGold(int Amount);
 
+	bool m_ShowWelcomMotd;
+
+	void PressVote(short Pressed);
 private:
 	bool m_Spectate;
 

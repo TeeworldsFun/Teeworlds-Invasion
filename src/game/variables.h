@@ -155,4 +155,7 @@ MACRO_CONFIG_STR(SvInvMap, sv_dont_use_j92tka9j, 128, "", CFGFLAG_SERVER, "Lates
 
 MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
+
+MACRO_CONFIG_STR(SvWelcomeMsg, sv_welcome_msg, 1600, "", CFGFLAG_SERVER, "Message for the enter clients(as motd)")
+
 #endif

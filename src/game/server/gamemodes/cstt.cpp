@@ -700,7 +700,10 @@ void CGameControllerCSTT::AutoBalance()
 	}
 	
 	if ((Red+RedBots) < g_Config.m_SvPreferredTeamSize || (Blue+BlueBots) < g_Config.m_SvPreferredTeamSize)
+	{
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "engine", "Adding bots...");
 		GameServer()->AddBot();
+	}
 }
 
 

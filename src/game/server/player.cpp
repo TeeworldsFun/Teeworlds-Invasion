@@ -67,6 +67,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	GameServer()->ResetVotes();
 
 	m_ToBeKicked = false;
+
+	m_ShowWelcomMotd = true;
 }
 
 CPlayer::~CPlayer()
@@ -823,4 +825,15 @@ bool CPlayer::IncreaseGold(int Amount)
 	}
 
 	return false;
+}
+
+// 1 == F3
+// -1 == F4
+void CPlayer::PressVote(short Pressed)
+{
+	dbg_msg("PE", "%d", Pressed);
+	if (Pressed == -1)
+		m_ShowWelcomMotd = false;
+	else if (Pressed == 1)
+		m_ShowWelcomMotd = true;
 }
