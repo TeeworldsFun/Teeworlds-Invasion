@@ -1,22 +1,19 @@
-
---[[@GROUP Configuration@END]]--
-
---[[@FUNCTION
-	TODO
-@END]]--
 function loadfile_(filename, env)
 	local file
 	if _VERSION == "Lua 5.1" then
 		file = loadfile(filename)
-		if file then
-			setfenv(file, env)
-		end
+		setfenv(file, env)
 	else
 		file = loadfile(filename, nil, env)
 	end
 	return file
 end
 
+--[[@GROUP Configuration@END]]--
+
+--[[@FUNCTION
+	TODO
+@END]]--
 function NewConfig(on_configured_callback)
 	local config = {}
 

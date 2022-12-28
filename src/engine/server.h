@@ -5,6 +5,9 @@
 #include "kernel.h"
 #include "message.h"
 
+#include <game/generated/protocol.h>
+#include <engine/shared/protocol.h>
+
 class IServer : public IInterface
 {
 	MACRO_INTERFACE("server", 0)
@@ -13,6 +16,13 @@ protected:
 	int m_TickSpeed;
 
 public:
+	enum
+	{
+		AUTHED_NO=0,
+		AUTHED_MOD,
+		AUTHED_ADMIN,
+	};
+public:
 	/*
 		Structure: CClientInfo
 	*/
@@ -20,6 +30,8 @@ public:
 	{
 		const char *m_pName;
 		int m_Latency;
+		int m_Authed;
+		bool m_CustClt;
 	};
 
 	int Tick() const { return m_CurrentGameTick; }
@@ -67,6 +79,7 @@ public:
 	virtual void DemoRecorder_HandleAutoStart() = 0;
 	virtual bool DemoRecorder_IsRecording() = 0;
 	
+	virtual void ExpireServerInfo() = 0;
 	virtual void AddZombie() = 0;
 	
 	virtual char *GetMapName() = 0;
@@ -97,7 +110,7 @@ public:
 	virtual void AddZombie() = 0;
 	virtual bool AIInputUpdateNeeded(int ClientID) = 0;
 	virtual void AIUpdateInput(int ClientID, int *Data) = 0; // MAX_INPUT_SIZE
-	
+
 	virtual void OnClientConnected(int ClientID, bool AI = false) = 0;
 	virtual void OnClientEnter(int ClientID) = 0;
 	virtual void OnClientDrop(int ClientID, const char *pReason) = 0;
@@ -110,6 +123,9 @@ public:
 	virtual const char *GameType() = 0;
 	virtual const char *Version() = 0;
 	virtual const char *NetVersion() = 0;
+
+	virtual void OnSetAuthed(int ClientID, int Level) = 0;
+	virtual class CLayers *Layers() = 0;
 };
 
 extern IGameServer *CreateGameServer();

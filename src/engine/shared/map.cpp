@@ -1,3 +1,5 @@
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 #include <engine/map.h>
 #include <engine/storage.h>
@@ -38,6 +40,11 @@ public:
 	virtual unsigned Crc()
 	{
 		return m_DataFile.Crc();
+	}
+
+	virtual SHA256_DIGEST Sha256()
+	{
+		return m_DataFile.Sha256();
 	}
 
 	virtual CDataFileReader* GetFileReader() { return &m_DataFile; } // MapGen

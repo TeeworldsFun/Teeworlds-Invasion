@@ -4,6 +4,7 @@
 #define BASE_MATH_H
 
 #include <stdlib.h>
+#include <random>
 
 template <typename T>
 inline T clamp(T val, T min, T max)
@@ -20,6 +21,11 @@ inline float sign(float f)
 	return f<0.0f?-1.0f:1.0f;
 }
 
+inline int round_truncate(float f)
+{
+	return (int)f;
+}
+
 inline int round_to_int(float f)
 {
 	if(f > 0)
@@ -33,6 +39,9 @@ inline T mix(const T a, const T b, TB amount)
 	return a + (b-a)*amount;
 }
 
+float random_float();
+bool random_prob(float f);
+int random_int(int Min, int Max);
 inline float frandom() { return rand()/(float)(RAND_MAX); }
 
 // float to fixed
@@ -65,26 +74,36 @@ const float pi = 3.1415926535897932384626433f;
 
 template <typename T> inline T min(T a, T b) { return a<b?a:b; }
 template <typename T> inline T max(T a, T b) { return a>b?a:b; }
-template <typename T> inline T absolute(T a) { return a<T(0)?-a:a; }
+template <typename T> inline T mt_absolute(T a) { return a<T(0)?-a:a; }
 
-// MapGen: Perlin Noise
-inline double fade(double t)
+template<typename T>
+constexpr inline T minimum(T a, T b)
 {
-    return t * t * t * (t * (t * 6 - 15) + 10);
+	return a < b ? a : b;
 }
 
-inline double lerp(double t, double a, double b)
+template<typename T>
+constexpr inline T minimum(T a, T b, T c)
 {
-    return a + t * (b - a);
+	return minimum(minimum(a, b), c);
 }
 
-inline double grad(int hash, double x, double y, double z)
+template<typename T>
+constexpr inline T maximum(T a, T b)
 {
-    int h = hash & 15;
-    double u = h < 8 ? x : y;
-    double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+	return a > b ? a : b;
 }
 
+template<typename T>
+constexpr inline T maximum(T a, T b, T c)
+{
+	return maximum(maximum(a, b), c);
+}
+
+template<typename T>
+constexpr inline T absolute(T a)
+{
+	return a < T(0) ? -a : a;
+}
 
 #endif // BASE_MATH_H
