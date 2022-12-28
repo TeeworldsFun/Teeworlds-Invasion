@@ -1,8 +1,9 @@
 Teeworlds : Ninslash
 ====
 
-# Ninslash mod for Teeworlds. Teeslash.
-# Original game author of Ninslash is Siile
+**Ninslash** mod for **Teeworlds**. **Teeslash**.
+
+Original game author of Ninslash is **Siile**
 
 
 # TODO
