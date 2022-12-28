@@ -25,6 +25,8 @@ public:
 
 private:
 	int m_IDs[NUM_IDS];
+	int m_IDs2[NUM_IDS];
+	int m_IDs3[NUM_IDS];
 	int m_aIDs[NUM_IDS];
 };
 

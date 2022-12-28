@@ -1890,7 +1890,9 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, bool Life
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;
 	
-		
+	if(!GetPlayer()->m_pAI && !GameServer()->m_apPlayers[From]->m_pAI && str_comp(g_Config.m_SvGametype, "coop") == 0)
+		return false;
+
 	// m_pPlayer only inflicts half damage on self
 	if(From == m_pPlayer->GetCID())
 		Dmg = max(1, Dmg/2);
