@@ -786,8 +786,7 @@ int CServer::ClientRejoinCallback(int ClientID, void *pUser)
 
 	pThis->m_aClients[ClientID].Reset();
 
-	if (!g_Config.m_SvMapGen ||  str_comp(g_Config.m_SvMap, "generated") == 0)
-		pThis->SendMap(ClientID);
+	pThis->SendMap(ClientID);
 
 	return 0;
 }
@@ -804,8 +803,7 @@ int CServer::NewClientNoAuthCallback(int ClientID, void *pUser)
 	pThis->m_aClients[ClientID].m_pRconCmdToSend = 0;
 	pThis->m_aClients[ClientID].Reset();
 
-	if (!g_Config.m_SvMapGen ||  str_comp(g_Config.m_SvMap, "generated") == 0)
-		pThis->SendMap(ClientID);
+	pThis->SendMap(ClientID);
 	pThis->SendCapabilities(ClientID);
 
 	return 0;
@@ -1921,8 +1919,7 @@ int CServer::Run()
 						if(m_aClients[ClientID].m_State <= CClient::STATE_AUTH)
 							continue;
 
-						if (!g_Config.m_SvMapGen ||  str_comp(g_Config.m_SvMap, "generated") == 0)
-							SendMap(ClientID);
+						SendMap(ClientID);
 						
 						m_aClients[ClientID].Reset();
 						m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
