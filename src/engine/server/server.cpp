@@ -2363,7 +2363,7 @@ int main(int argc, const char **argv) // ignore_convention
 void CServer::AddZombie()
 {
 	int ClientID = -1;
-	for (int i = 0; i < MAX_CLIENTS; i++)
+	for (int i = 16; i < MAX_CLIENTS; i++)
 	{
 		if (m_aClients[i].m_State == CClient::STATE_EMPTY)
 		{
@@ -2405,7 +2405,7 @@ void CServer::AddZombie()
 		case 11: str_format(aName1, sizeof(aName1), "Afro"); break;
 		case 12: str_format(aName1, sizeof(aName1), "Red"); break;
 		case 13: str_format(aName1, sizeof(aName1), "And"); break;
-		case 14: str_format(aName1, sizeof(aName1), "Boss"); break;
+		case 14: str_format(aName1, sizeof(aName1), "Ts"); break;
 		case 15: str_format(aName1, sizeof(aName1), "Nek"); break;
 		case 16: str_format(aName1, sizeof(aName1), "Pat"); break;
 		case 17: str_format(aName1, sizeof(aName1), "Hos"); break;
@@ -2413,7 +2413,7 @@ void CServer::AddZombie()
 		case 19: str_format(aName1, sizeof(aName1), "Dis"); break;
 		case 20: str_format(aName1, sizeof(aName1), "Fat"); break;
 		case 21: str_format(aName1, sizeof(aName1), "Win"); break;
-		case 22: str_format(aName1, sizeof(aName1), "Los"); break;
+		case 22: str_format(aName1, sizeof(aName1), "Dark"); break;
 		case 23: str_format(aName1, sizeof(aName1), "Def"); break;
 		case 24: str_format(aName1, sizeof(aName1), "Whi"); break;
 		case 25: str_format(aName1, sizeof(aName1), "Dil"); break;
@@ -2425,7 +2425,7 @@ void CServer::AddZombie()
 		case 31: str_format(aName1, sizeof(aName1), "Pau"); break;
 		case 32: str_format(aName1, sizeof(aName1), "Two"); break;
 		case 33: str_format(aName1, sizeof(aName1), "One"); break;
-		case 34: str_format(aName1, sizeof(aName1), "Jon"); break;
+		case 34: str_format(aName1, sizeof(aName1), "Flower"); break;
 		case 35: str_format(aName1, sizeof(aName1), "Hax"); break;
 		case 36: str_format(aName1, sizeof(aName1), "Nig"); break;
 		case 37: str_format(aName1, sizeof(aName1), "Ho"); break;
@@ -2449,7 +2449,7 @@ void CServer::AddZombie()
 		case 11: str_format(aName2, sizeof(aName2), "gon"); break;
 		case 12: str_format(aName2, sizeof(aName2), "ho"); break;
 		case 13: str_format(aName2, sizeof(aName2), "pie"); break;
-		case 14: str_format(aName2, sizeof(aName2), "la"); break;
+		case 14: str_format(aName2, sizeof(aName2), "Freddie"); break;
 		case 15: str_format(aName2, sizeof(aName2), "sie"); break;
 		case 16: str_format(aName2, sizeof(aName2), "doge"); break;
 		case 17: str_format(aName2, sizeof(aName2), "nana"); break;
@@ -2458,7 +2458,7 @@ void CServer::AddZombie()
 		case 20: str_format(aName2, sizeof(aName2), "tee"); break;
 		case 21: str_format(aName2, sizeof(aName2), "lan"); break;
 		case 22: str_format(aName2, sizeof(aName2), "ly"); break;
-		case 23: str_format(aName2, sizeof(aName2), "ling"); break;
+		case 23: str_format(aName2, sizeof(aName2), "Rice"); break;
 		case 24: str_format(aName2, sizeof(aName2), "do"); break;
 		case 25: str_format(aName2, sizeof(aName2), "die"); break;
 		case 26: str_format(aName2, sizeof(aName2), "be"); break;
@@ -2474,8 +2474,8 @@ void CServer::AddZombie()
 		case 36: str_format(aName2, sizeof(aName2), "hax"); break;
 		case 37: str_format(aName2, sizeof(aName2), "ger"); break;
 		case 38: str_format(aName2, sizeof(aName2), "mo"); break;
-		case 39: str_format(aName2, sizeof(aName2), "rd"); break;
-		default: str_format(aName2, sizeof(aName2), "uit"); break;
+		case 39: str_format(aName2, sizeof(aName2), "-Sans"); break;
+		default: str_format(aName2, sizeof(aName2), "SB"); break;
 	}
 	
 	
