@@ -34,6 +34,13 @@
 
 #include <game/server/playerdata.h>
 
+#include <teeuniverses/components/localization.h>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <cstring>
+
 #if defined(CONF_FAMILY_WINDOWS)
 	#define _WIN32_WINNT 0x0501
 	#define WIN32_LEAN_AND_MEAN
@@ -2309,6 +2316,14 @@ int main(int argc, const char **argv) // ignore_convention
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();
 
+	pServer->m_pLocalization = new CLocalization(pStorage);
+	pServer->m_pLocalization->InitConfig(0, NULL);
+	if (!pServer->m_pLocalization->Init())
+	{
+		dbg_msg("localization", "could not initialize localization");
+		return -1;
+	}
+
 	{
 		bool RegisterFail = false;
 
@@ -2346,6 +2361,7 @@ int main(int argc, const char **argv) // ignore_convention
 	pServer->Run();
 
 	// free
+	delete pServer->m_pLocalization;
 	delete pServer;
 	delete pKernel;
 	delete pEngineMap;

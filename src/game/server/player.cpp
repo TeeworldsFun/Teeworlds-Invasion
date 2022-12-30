@@ -369,7 +369,7 @@ void CPlayer::OnDisconnect(const char *pReason)
 				str_format(aBuf, sizeof(aBuf), "'%s' has left the game (%s)", Server()->ClientName(m_ClientID), pReason);
 			else
 				str_format(aBuf, sizeof(aBuf), "'%s' has left the game", Server()->ClientName(m_ClientID));
-			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+			GameServer()->SendChatTarget(-1, aBuf);
 		}
 
 		str_format(aBuf, sizeof(aBuf), "leave player='%d:%s'", m_ClientID, Server()->ClientName(m_ClientID));
@@ -480,7 +480,7 @@ void CPlayer::SetWantedTeam(int Team, bool DoChatMsg)
 	if(DoChatMsg)
 	{
 		str_format(aBuf, sizeof(aBuf), "'%s' is joining the %s", Server()->ClientName(m_ClientID), GameServer()->m_pController->GetTeamName(Team));
-		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+		GameServer()->SendChatTarget(-1, aBuf);
 	}
 	
 	m_WantedTeam = Team;
@@ -501,7 +501,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	if(DoChatMsg)
 	{
 		str_format(aBuf, sizeof(aBuf), "'%s' joined the %s", Server()->ClientName(m_ClientID), GameServer()->m_pController->GetTeamName(Team));
-		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+		GameServer()->SendChatTarget(-1, aBuf);
 	}
 	*/
 
@@ -727,9 +727,9 @@ void CPlayer::ListBuyableWeapons()
 		return;
 	}
 	*/
-	
-	GameServer()->SendChatTarget(GetCID(), "Available weapons to buy:");
-	
+
+	GameServer()->SendChatTarget(GetCID(), _("Available weapons to buy:"));
+
 	for (int i = 0; i < NUM_CUSTOMWEAPONS; i++)
 	{
 		if (!GotWeapon(i) && aCustomWeapon[i].m_Cost > 0 && (GotWeapon(aCustomWeapon[i].m_Require) || aCustomWeapon[i].m_Require == -1))
@@ -737,9 +737,7 @@ void CPlayer::ListBuyableWeapons()
 			if (aCustomWeapon[i].m_Require >= 0 && WeaponDisabled(aCustomWeapon[i].m_Require))
 				continue;
 			
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "%s - %s - %d points", aCustomWeapon[i].m_BuyCmd, aCustomWeapon[i].m_Name, aCustomWeapon[i].m_Cost);
-			GameServer()->SendChatTarget(GetCID(), aBuf);
+			GameServer()->SendChatTarget(GetCID(), _("{%s} - {%s} - {%d} points"), aCustomWeapon[i].m_BuyCmd, Server()->Localization()->Localize(m_Language, aCustomWeapon[i].m_Name), aCustomWeapon[i].m_Cost);
 		}
 	}
 }
@@ -754,7 +752,7 @@ bool CPlayer::BuyWeapon(int CustomWeapon)
 
 	if (!GetCharacter())
 	{
-		GameServer()->SendChatTarget(GetCID(), "You must be alive to do shopping");
+		GameServer()->SendChatTarget(GetCID(), _("You must be alive to do shopping"));
 		return false;
 	}
 	
@@ -831,7 +829,6 @@ bool CPlayer::IncreaseGold(int Amount)
 // -1 == F4
 void CPlayer::PressVote(short Pressed)
 {
-	dbg_msg("PE", "%d", Pressed);
 	if (Pressed == -1)
 		m_ShowWelcomMotd = false;
 	else if (Pressed == 1)

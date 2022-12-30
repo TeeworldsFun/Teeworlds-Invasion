@@ -296,6 +296,13 @@ public:
 	bool m_ShowWelcomMotd;
 
 	void PressVote(short Pressed);
+
+	char m_Language[64];
+	void SetLanguage(const char Language[64])
+	{
+		str_copy(m_Language, Language, sizeof(m_Language));
+	}
+
 private:
 	bool m_Spectate;
 

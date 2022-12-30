@@ -136,7 +136,7 @@ vec2 CGameControllerCoop::GetBotSpawnPos()
 void CGameControllerCoop::RandomGroupSpawnPos()
 {
 	m_GroupSpawnPos = m_aEnemySpawnPos[rand() % m_NumEnemySpawnPos];
-	//GameServer()->m_pArrow;
+	// GameServer()->m_pArrow;
 }
 
 bool CGameControllerCoop::CanSpawn(int Team, vec2 *pOutPos, bool IsBot)
@@ -235,7 +235,7 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 	m_EnemiesLeft = 20;
 	m_GroupSpawnTick = 0;
 
-	GameServer()->SendBroadcast("Wave incoming!", -1, true);
+	GameServer()->SendBroadcast(_("Wave incoming!"), -1, true);
 
 	g_Config.m_SvInvBosses = 1;
 
@@ -264,7 +264,7 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 
 void CGameControllerCoop::DisplayExit(vec2 Pos)
 {
-	//m_pDoor->Activate(Pos);
+	// m_pDoor->Activate(Pos);
 }
 
 int CGameControllerCoop::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
@@ -278,14 +278,14 @@ int CGameControllerCoop::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 			if (m_GroupsLeft <= 0)
 			{
 				TriggerEscape();
-				GameServer()->SendBroadcast("Level cleared!", -1, true);
+				GameServer()->SendBroadcast(_("Level cleared!"), -1, true);
 				m_pExit->m_Active = true;
 			}
 			else if (!m_GroupSpawnTick)
 			{
 				m_GroupSpawnTick = Server()->Tick() + Server()->TickSpeed() * 7;
 				if (m_Group > 1)
-					GameServer()->SendBroadcast("Wave cleared!", -1, true);
+					GameServer()->SendBroadcast(_("Wave cleared!"), -1, true);
 			}
 		}
 
@@ -314,11 +314,7 @@ void CGameControllerCoop::NextLevel(int CID)
 		m_RoundWinTick = Server()->Tick() + Server()->TickSpeed() * CountHumans() * 1;
 
 		if (CountHumans() > 1)
-		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "%s reached the door", Server()->ClientName(CID));
-			GameServer()->SendBroadcast(aBuf, -1);
-		}
+			GameServer()->SendBroadcast(_("{%s} reached the door"), -1, true, Server()->ClientName(CID));
 	}
 
 	CPlayer *pPlayer = GameServer()->m_apPlayers[CID];

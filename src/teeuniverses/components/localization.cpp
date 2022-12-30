@@ -48,7 +48,7 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, IStorage* pSto
 	json_settings JsonSettings;
 	mem_zero(&JsonSettings, sizeof(JsonSettings));
 	char aError[256];
-	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
+	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
 	free(pFileData);
 
 	if(pJsonData == nullptr)
@@ -133,7 +133,7 @@ bool CLocalization::Init()
 	json_settings JsonSettings;
 	mem_zero(&JsonSettings, sizeof(JsonSettings));
 	char aError[256];
-	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
+	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
 	free(pFileData);
 	if(pJsonData == nullptr)
 		return true; // return true because it's not a critical error

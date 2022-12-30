@@ -16,6 +16,8 @@ protected:
 	int m_TickSpeed;
 
 public:
+	class CLocalization *m_pLocalization;
+	inline class CLocalization *Localization() { return m_pLocalization; }
 	enum
 	{
 		AUTHED_NO=0,

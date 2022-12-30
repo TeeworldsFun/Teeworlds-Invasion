@@ -311,18 +311,10 @@ void CCharacter::SetCustomWeapon(int CustomWeapon)
 		m_ClipReloadTimer = 0;
 
 	if (!m_IsBot && GetPlayer()->m_EnableWeaponInfo == 1)
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "Using: %s", aCustomWeapon[CustomWeapon].m_Name);
-		GameServer()->SendChatTarget(GetPlayer()->GetCID(), aBuf);
-	}
+		GameServer()->SendChatTarget(GetPlayer()->GetCID(), _("Using: %s"), Server()->Localization()->Localize(GetPlayer()->m_Language, aCustomWeapon[CustomWeapon].m_Name));
 
 	if (!m_IsBot && GetPlayer()->m_EnableWeaponInfo == 2 && GameServer()->m_BroadcastLockTick < Server()->Tick())
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "Using: %s", aCustomWeapon[CustomWeapon].m_Name);
-		GameServer()->SendBroadcast(aBuf, GetPlayer()->GetCID());
-	}
+		GameServer()->SendBroadcast(_("Using: {%s}"), GetPlayer()->GetCID(), false, Server()->Localization()->Localize(GetPlayer()->m_Language, aCustomWeapon[CustomWeapon].m_Name));
 }
 
 bool CCharacter::IsGrounded()

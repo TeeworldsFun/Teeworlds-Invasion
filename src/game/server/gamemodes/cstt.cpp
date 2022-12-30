@@ -427,21 +427,21 @@ void CGameControllerCSTT::RoundWinLose()
 
 	if (win == TERRORISTS_WIN)
 	{
-		GameServer()->SendBroadcast("Terrorists win", -1, true);
+		GameServer()->SendBroadcast(_("Terrorists win"), -1, true);
 		GameServer()->CreateSoundGlobal(SOUND_CTF_CAPTURE, -1);
 		m_aTeamscore[TEAM_RED]++;
 		RoundRewards(TEAM_RED);
 	}
 	else if (win == COUNTERTERRORISTS_WIN)
 	{
-		GameServer()->SendBroadcast("Counter-terrorists win", -1, true);
+		GameServer()->SendBroadcast(_("Counter-terrorists win"), -1, true);
 		GameServer()->CreateSoundGlobal(SOUND_CTF_CAPTURE, -1);
 		m_aTeamscore[TEAM_BLUE]++;
 		RoundRewards(TEAM_BLUE);
 	}
 	else // draw
 	{
-		GameServer()->SendBroadcast("Nobody wins", -1, true);
+		GameServer()->SendBroadcast(_("Nobody wins"), -1, true);
 		GameServer()->CreateSoundGlobal(SOUND_TEE_CRY, -1);
 		RoundRewards(-1);
 	}
@@ -469,9 +469,9 @@ void CGameControllerCSTT::Restart()
 	
 	m_aTeamscore[TEAM_RED] = 0;
 	m_aTeamscore[TEAM_BLUE] = 0;
-	
-	GameServer()->SendBroadcast("", -1);
-	
+
+	GameServer()->SendBroadcast(_(""), -1);
+
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		m_aDefusing[i] = false;
@@ -576,8 +576,8 @@ void CGameControllerCSTT::StartCountdown()
 		
 		pPlayer->m_CanShop = true;
 	}
-	
-	GameServer()->SendBroadcast("Prepare for battle (shop using vote menu)", -1, true);
+
+	GameServer()->SendBroadcast(_("Prepare for battle (shop using vote menu)"), -1, true);
 	GameServer()->ResetVotes();
 }
 
@@ -599,8 +599,8 @@ void CGameControllerCSTT::StartRound()
 	// unfreeze players, prevent respawning until end of round
 	GameServer()->m_FreezeCharacters = false;
 	GameServer()->m_CanRespawn = false;
-	
-	GameServer()->SendBroadcast("GO!", -1);
+
+	GameServer()->SendBroadcast(_("GO!"), -1);
 	GameServer()->CreateSoundGlobal(SOUND_NINJA_HIT, -1);
 	
 }
@@ -741,11 +741,11 @@ void CGameControllerCSTT::Tick()
 		if (m_GameState == GAMESTATE_NEWGAME)
 		{
 			//if (m_RoundTick == 60)
-			//	GameServer()->SendBroadcast("First round starting in 3...", -1);
+			//	GameServer()->SendBroadcast(_("First round starting in 3...", -1);
 			if (m_RoundTick == 120)
-				GameServer()->SendBroadcast("First round starting in 2...", -1, true);
+				GameServer()->SendBroadcast(_("First round starting in 2..."), -1, true);
 			if (m_RoundTick == 180)
-				GameServer()->SendBroadcast("First round starting in 1...", -1, true);
+				GameServer()->SendBroadcast(_("First round starting in 1..."), -1, true);
 			if (m_RoundTick == 240)
 				StartCountdown();
 		}
@@ -757,7 +757,7 @@ void CGameControllerCSTT::Tick()
 				char aBuf[128];
 				//str_format(aBuf, sizeof(aBuf), "Round %d / %d", m_Round, g_Config.m_SvNumRounds);
 				str_format(aBuf, sizeof(aBuf), "Round %d", m_Round);
-				GameServer()->SendBroadcast(aBuf, -1, true);
+				GameServer()->SendBroadcast(_("Round {%d}"), -1, true, m_Round);
 				
 				GiveBombToPlayer();
 			}
@@ -814,7 +814,7 @@ void CGameControllerCSTT::Tick()
 		
 		if (!pPlayer->m_Welcomed && !pPlayer->m_IsBot)
 		{
-			GameServer()->SendBroadcast("Welcome to Counter-Strike: Tee Time", pPlayer->GetCID(), true);
+			GameServer()->SendBroadcast(_("Welcome to Counter-Strike: Tee Time"), pPlayer->GetCID(), true);
 			pPlayer->m_Welcomed = true;
 		}
 	}
@@ -926,7 +926,7 @@ void CGameControllerCSTT::Tick()
 							
 				/*
 				if (pPlayer->m_ActionTimer++ == 0)
-					GameServer()->SendBroadcast("Defusing bomb", pPlayer->GetCID());
+					GameServer()->SendBroadcast(_("Defusing bomb", pPlayer->GetCID());
 				*/
 				
 				int p = ++pPlayer->m_ActionTimer*100 / (g_Config.m_SvBombDefuseTime*Server()->TickSpeed());
@@ -947,7 +947,7 @@ void CGameControllerCSTT::Tick()
 					str_format(aBuf, sizeof(aBuf), "%s defused the bomb!", Server()->ClientName(pPlayer->GetCID()));
 					GameServer()->SendBroadcast(aBuf, -1, true);
 					
-					//GameServer()->SendBroadcast("Bomb defused!", -1, true);
+					//GameServer()->SendBroadcast(_("Bomb defused!", -1, true);
 					GameServer()->CreateSoundGlobal(SOUND_CTF_GRAB_PL, -1);
 								
 					m_RoundTimeLimit = 0; // gamecontroller
@@ -961,7 +961,7 @@ void CGameControllerCSTT::Tick()
 				if (pPlayer->m_ActionTimer > 0)
 				{
 					pPlayer->m_ActionTimer = 0;
-					GameServer()->SendBroadcast("", pPlayer->GetCID());
+					GameServer()->SendBroadcast(_(""), pPlayer->GetCID());
 				}
 			}
 		}
@@ -980,7 +980,7 @@ void CGameControllerCSTT::Tick()
 			{
 				B->m_Hide = true;
 				m_BombDefused = true;
-				GameServer()->SendBroadcast("Bomb defused!", -1, true);
+				GameServer()->SendBroadcast(_("Bomb defused!", -1, true);
 				GameServer()->CreateSoundGlobal(SOUND_CTF_GRAB_PL, -1);
 							
 				m_RoundTimeLimit = 0; // gamecontroller
@@ -1021,7 +1021,7 @@ void CGameControllerCSTT::Tick()
 						pPlayer->m_ActionTimer = 0;
 						B->m_Timer = 0;
 						
-						//GameServer()->SendBroadcast("Planting bomb", pPlayer->GetCID());
+						//GameServer()->SendBroadcast(_("Planting bomb", pPlayer->GetCID());
 					}
 					else if (B->m_Status == BOMB_PLANTING)
 					{
@@ -1055,7 +1055,7 @@ void CGameControllerCSTT::Tick()
 							char aBuf[128];
 							str_format(aBuf, sizeof(aBuf), "%s planted the bomb!", Server()->ClientName(pPlayer->GetCID()));
 							GameServer()->SendBroadcast(aBuf, -1, true);
-							//GameServer()->SendBroadcast("Bomb planted!", -1, true);
+							//GameServer()->SendBroadcast(_("Bomb planted!", -1, true);
 							GameServer()->CreateSoundGlobal(SOUND_CTF_GRAB_PL, -1);
 							
 							m_RoundTimeLimit = g_Config.m_SvBombTime; // gamecontroller
@@ -1072,7 +1072,7 @@ void CGameControllerCSTT::Tick()
 		{
 			B->m_Status = BOMB_CARRYING;
 			pPlayer->m_ActionTimer = 0;
-			GameServer()->SendBroadcast("", B->m_pCarryingCharacter->GetPlayer()->GetCID());
+			GameServer()->SendBroadcast(_(""), B->m_pCarryingCharacter->GetPlayer()->GetCID());
 		}
 	}
 	else if (B->m_Status == BOMB_IDLE)

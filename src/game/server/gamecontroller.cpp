@@ -897,7 +897,7 @@ void IGameController::Snap(int SnappingClient)
 		GAMEINFOFLAG2_HUD_AMMO |
 		GAMEINFOFLAG2_HUD_HEALTH_ARMOR |
 		GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE;
-	
+
 	pGameInfoEx->m_Version = GAMEINFO_CURVERSION;
 
 	CNetObj_SwitchState *pSwitchState = static_cast<CNetObj_SwitchState *>(Server()->SnapNewItem(NETOBJTYPE_SWITCHSTATE, 0, sizeof(CNetObj_SwitchState)));
@@ -1261,19 +1261,19 @@ void IGameController::DeathMessage()
 	switch (rand() % 5)
 	{
 	case 0:
-		GameServer()->SendBroadcast("All hope is lost", -1);
+		GameServer()->SendBroadcast(_("All hope is lost"), -1);
 		break;
 	case 1:
-		GameServer()->SendBroadcast("Slaughter", -1);
+		GameServer()->SendBroadcast(_("Slaughter"), -1);
 		break;
 	case 2:
-		GameServer()->SendBroadcast("Ocean of blood", -1);
+		GameServer()->SendBroadcast(_("Ocean of blood"), -1);
 		break;
 	case 3:
-		GameServer()->SendBroadcast("Death takes all", -1);
+		GameServer()->SendBroadcast(_("Death takes all"), -1);
 		break;
 	default:
-		GameServer()->SendBroadcast("Everybody dies", -1);
+		GameServer()->SendBroadcast(_("Everybody dies"), -1);
 		break;
 	};
 }

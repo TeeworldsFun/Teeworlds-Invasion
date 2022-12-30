@@ -20,6 +20,7 @@
 
 #include "block-solve.h"
 
+#include <teeuniverses/components/localization.h>
 /*
 	Tick
 		Game Context (CGameContext::tick)
@@ -157,11 +158,11 @@ public:
 	};
 
 	// network
-	void SendChatTarget(int To, const char *pText);
+	void SendChatTarget(int To, const char *pText, ...);
 	void SendChat(int ClientID, int Team, const char *pText);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
-	void SendBroadcast(const char *pText, int ClientID, bool Lock = false);
+	void SendBroadcast(const char *pText, int ClientID, bool Lock = false, ...);
 
 
 	//

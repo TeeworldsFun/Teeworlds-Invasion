@@ -217,7 +217,7 @@ void CGameControllerDOM::BaseTick()
 					if (m_aCapturing[c] == i)
 					{
 						m_aCapturing[c] = -1;
-						GameServer()->SendBroadcast("", pPlayer->GetCID());
+						GameServer()->SendBroadcast(_(""), pPlayer->GetCID());
 					}
 					
 					continue;
@@ -229,7 +229,7 @@ void CGameControllerDOM::BaseTick()
 						if (m_aCapturing[c] == i)
 						{
 							m_aCapturing[c] = -1;
-							GameServer()->SendBroadcast("", pPlayer->GetCID());
+							GameServer()->SendBroadcast(_(""), pPlayer->GetCID());
 						}
 						
 						continue;
@@ -355,7 +355,7 @@ void CGameControllerDOM::Tick()
 		
 		if (!pPlayer->m_Welcomed && !pPlayer->m_IsBot)
 		{
-			GameServer()->SendBroadcast("Welcome to Domination++", pPlayer->GetCID(), true);
+			GameServer()->SendBroadcast(_("Welcome to Domination++"), pPlayer->GetCID(), true);
 			pPlayer->m_Welcomed = true;
 		}
 	}
