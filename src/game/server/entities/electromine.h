@@ -3,7 +3,7 @@
 
 #include <game/server/entity.h>
 
-//const int PickupPhysSize = 14;
+// const int PickupPhysSize = 14;
 
 class CElectromine : public CEntity
 {
@@ -17,7 +17,7 @@ public:
 
 	int m_Life;
 	int m_Owner;
-	
+
 	int m_ElectroTimer;
 
 	bool m_Flashing;

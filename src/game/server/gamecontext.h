@@ -18,6 +18,8 @@
 #include <engine/storage.h> // MapGen
 #include "mapgen.h"
 
+#include "block-solve.h"
+
 /*
 	Tick
 		Game Context (CGameContext::tick)
@@ -50,6 +52,8 @@ class CGameContext : public IGameServer
 	// MapGen
 	CMapGen m_MapGen;
 	IStorage *m_pStorage;
+
+	class CBlockSolve *m_pBlockSolve;
 
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
@@ -85,6 +89,7 @@ public:
 	IStorage *Storage() const { return m_pStorage; }
 	CMapGen *MapGen() { return &m_MapGen; }
 
+	class CBlockSolve *BlockSolve() { return m_pBlockSolve; }
 	CGameContext();
 	~CGameContext();
 

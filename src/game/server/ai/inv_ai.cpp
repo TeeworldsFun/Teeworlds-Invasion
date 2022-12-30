@@ -258,85 +258,44 @@ void CAIinvasion::ReceiveDamage(int CID, int Dmg)
 
 void CAIinvasion::DoBehavior()
 {
+	// reset jump and attack
+	m_Jump = 0;
 	m_Attack = 0;
 
+	
 	HeadToMovingDirection();
+
 	SeekClosestEnemyInSight();
-	bool Shooting = false;
 
 	// if we see a player
 	if (m_EnemiesInSight > 0)
 	{
+		ShootAtClosestEnemy();
 		ReactToPlayer();
-		// m_Triggered = true;
-
-		if (!m_MoveReactTime)
-			m_MoveReactTime++;
-
-		if (ShootAtClosestEnemy())
-		{
-			Shooting = true;
-			ReactToPlayer();
-
-			if (WeaponShootRange() - m_PlayerDistance > 200)
-			{
-				m_TargetPos = normalize(m_Pos - m_PlayerPos) * WeaponShootRange();
-				GameServer()->Collision()->IntersectLine(m_Pos, m_TargetPos, 0x0, &m_TargetPos);
-				// MoveTowardsWaypoint(true);
-				//
-			}
-		}
-		else
-		{
-			if (SeekClosestEnemy())
-			{
-				m_TargetPos = m_PlayerPos;
-
-				// if (WeaponShootRange() - m_PlayerDistance > 200)
-				//	SeekRandomWaypoint();
-			}
-		}
-	}
-	else if (!m_Triggered)
-	{
-		m_TargetPos = m_StartPos;
 	}
 	else
-	{
-		if (SeekClosestEnemy())
-			m_TargetPos = m_PlayerPos;
-	}
+		m_AttackTimer = 0;
 
-	if ((Shooting && Player()->GetCharacter()->IsGrounded()) || (abs(m_Pos.x - m_TargetPos.x) < 40 && abs(m_Pos.y - m_TargetPos.y) < 40))
+
+	//if (SeekClosestEnemy())
+	if (SeekRandomEnemy())
 	{
-		// stand still
-		m_Move = 0;
-		m_Jump = 0;
-		m_Hook = 0;
-	}
-	else
-	{
-		if (!m_MoveReactTime || m_MoveReactTime++ > 9)
+		m_TargetPos = m_PlayerPos;
+				
+		if (m_EnemiesInSight > 1)
 		{
-			if (UpdateWaypoint())
-			{
-				MoveTowardsWaypoint();
-			}
+			// distance to the player
+			if (m_PlayerPos.x < m_Pos.x)
+				m_TargetPos.x = m_PlayerPos.x + WeaponShootRange()/2*(0.5f+frandom()*1.0f);
 			else
-			{
-				m_WaypointPos = m_TargetPos;
-				MoveTowardsWaypoint(true);
-			}
+				m_TargetPos.x = m_PlayerPos.x - WeaponShootRange()/2*(0.5f+frandom()*1.0f);
 		}
 	}
-	
-	HeadToMovingDirection();
 
-	SeekClosestEnemyInSight();
 	
 	if (UpdateWaypoint())
 	{
-		MoveTowardsWaypoint(40);
+		MoveTowardsWaypoint(20);
 		HookMove();
 		AirJump();
 		
@@ -354,8 +313,8 @@ void CAIinvasion::DoBehavior()
 	Unstuck();
 
 	RandomlyStopShooting();
-
+	
 	// next reaction in
-	m_ReactionTime = 1 + rand() % 3;
+	m_ReactionTime = 2 + frandom()*4;
 	
 }

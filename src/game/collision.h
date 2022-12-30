@@ -3,11 +3,24 @@
 #ifndef GAME_COLLISION_H
 #define GAME_COLLISION_H
 
+#include <vector>
 #include <base/vmath.h>
 #include "pathfinding.h"
 
+enum BlockType
+{
+	BLOCKTYPE_SOLID,
+	BLOCKTYPE_UNHOOKABLE,
 
+	NUM_BLOCKTYPE,
+};
 
+class CBlockSolid
+{
+public:
+	vec2 m_Pos;
+	int m_Type;
+};
 
 class CCollision
 {
@@ -15,6 +28,8 @@ class CCollision
 	int m_Width;
 	int m_Height;
 	class CLayers *m_pLayers;
+	std::vector<CBlockSolid> m_pBlockSolid;
+	CBlockSolid *FindBlock(vec2 Pos);
 
 	int GetTile(int x, int y);
 
@@ -46,7 +61,9 @@ public:
 		COLFLAG_DAMAGEFLUID=128,
 		COLFLAG_INSTADEATH=256,
 	};
-	
+
+	void CreateBlock(vec2 Pos, int Type);
+
 	bool IsTileSolid(int x, int y, bool IncludeDeath = false);
 	
 	void GenerateWaypoints();
@@ -83,6 +100,13 @@ public:
 
 	// MapGen
 	bool ModifTile(ivec2 pos, int group, int layer, int tile, int flags, int reserved);
+
+	vec2 RoundPos(vec2 Pos)
+	{
+		Pos.x -= (int)Pos.x % 32 - 16;
+		Pos.y -= (int)Pos.y % 32 - 16;
+		return Pos;
+	}
 };
 
 #endif

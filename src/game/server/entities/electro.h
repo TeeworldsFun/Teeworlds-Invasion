@@ -16,7 +16,6 @@ public:
 	virtual void Snap(int SnappingClient);
 
 protected:
-
 private:
 	vec2 m_End;
 	bool m_Render;

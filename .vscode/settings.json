@@ -1,0 +1,13 @@
+{
+    "C_Cpp.errorSquiggles": "enabled",
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "files.associations": {
+        "fstream": "cpp",
+        "memory": "cpp",
+        "sstream": "cpp",
+        "regex": "cpp",
+        "cmath": "cpp"
+    }
+}

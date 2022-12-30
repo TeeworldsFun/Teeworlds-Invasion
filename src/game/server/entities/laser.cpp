@@ -6,7 +6,7 @@
 #include "superexplosion.h"
 
 CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Damage, int ExtraInfo)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
 	m_Damage = Damage;
 	m_ExtraInfo = ExtraInfo;
@@ -14,34 +14,32 @@ CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_Owner = Owner;
 	m_Energy = StartEnergy;
 	m_Dir = Direction;
-	//if (StartEnergy > 200)
+	// if (StartEnergy > 200)
 	//	m_Bounces = 2;
-	//else
-		m_Bounces = 0;
+	// else
+	m_Bounces = 0;
 	m_EvalTick = 0;
 	GameWorld()->InsertEntity(this);
 	DoBounce();
 }
-
 
 bool CLaser::HitCharacter(vec2 From, vec2 To)
 {
 	vec2 At;
 	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 	CCharacter *pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pOwnerChar);
-	if(!pHit)
+	if (!pHit)
 		return false;
 
 	m_From = From;
 	m_Pos = At;
 	m_Energy = -1;
 
-	//vec2 Dir = normalize(m_Pos-From) * 0.1f;
-	
-	//pHit->TakeDamage(Dir, m_Damage, m_Owner, WEAPON_RIFLE);
+	// vec2 Dir = normalize(m_Pos-From) * 0.1f;
+
+	// pHit->TakeDamage(Dir, m_Damage, m_Owner, WEAPON_RIFLE);
 	pHit->TakeDamage(vec2(0.f, 0.f), m_Damage, m_Owner, WEAPON_RIFLE);
 
-	
 	return true;
 }
 
@@ -49,23 +47,23 @@ void CLaser::DoBounce()
 {
 	m_EvalTick = Server()->Tick();
 
-	if(m_Energy < 0)
+	if (m_Energy < 0)
 	{
 		if (m_ExtraInfo == DOOMROCKETS)
 		{
 			CSuperexplosion *S = new CSuperexplosion(&GameServer()->m_World, m_Pos, m_Owner, WEAPON_RIFLE, 2);
 			GameServer()->m_World.InsertEntity(S);
 		}
-		
+
 		GameServer()->m_World.DestroyEntity(this);
 		return;
 	}
 
 	vec2 To = m_Pos + m_Dir * m_Energy;
 
-	if(GameServer()->Collision()->IntersectLine(m_Pos, To, 0x0, &To))
+	if (GameServer()->Collision()->IntersectLine(m_Pos, To, 0x0, &To))
 	{
-		if(!HitCharacter(m_Pos, To))
+		if (!HitCharacter(m_Pos, To))
 		{
 			// intersected
 			m_From = m_Pos;
@@ -81,7 +79,7 @@ void CLaser::DoBounce()
 			m_Energy -= distance(m_From, m_Pos) + GameServer()->Tuning()->m_LaserBounceCost;
 			m_Bounces++;
 
-			if(m_Bounces > 2)
+			if (m_Bounces > 2)
 				m_Energy = -1;
 
 			GameServer()->CreateSound(m_Pos, SOUND_RIFLE_BOUNCE);
@@ -89,7 +87,7 @@ void CLaser::DoBounce()
 	}
 	else
 	{
-		if(!HitCharacter(m_Pos, To))
+		if (!HitCharacter(m_Pos, To))
 		{
 			m_From = m_Pos;
 			m_Pos = To;
@@ -105,7 +103,7 @@ void CLaser::Reset()
 
 void CLaser::Tick()
 {
-	if(Server()->Tick() > m_EvalTick+(Server()->TickSpeed()*GameServer()->Tuning()->m_LaserBounceDelay)/1000.0f)
+	if (Server()->Tick() > m_EvalTick + (Server()->TickSpeed() * GameServer()->Tuning()->m_LaserBounceDelay) / 1000.0f)
 		DoBounce();
 }
 
@@ -116,11 +114,11 @@ void CLaser::TickPaused()
 
 void CLaser::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient))
+	if (NetworkClipped(SnappingClient))
 		return;
 
 	CNetObj_Laser *pObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_ID, sizeof(CNetObj_Laser)));
-	if(!pObj)
+	if (!pObj)
 		return;
 
 	pObj->m_X = (int)m_Pos.x;

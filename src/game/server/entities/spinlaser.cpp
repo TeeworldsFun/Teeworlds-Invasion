@@ -5,7 +5,7 @@
 #include "spinlaser.h"
 
 CSpinlaser::CSpinlaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner1, int Owner2, int Damage)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
 	m_Damage = Damage;
 	m_Pos = Pos;
@@ -14,13 +14,11 @@ CSpinlaser::CSpinlaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float S
 	m_Energy = StartEnergy;
 	m_Dir = Direction;
 
-	
 	m_EvalTick = Server()->Tick();
 	GameWorld()->InsertEntity(this);
-	
+
 	m_DamageTimer = 0;
 }
-
 
 bool CSpinlaser::HitCharacter(vec2 From, vec2 To)
 {
@@ -28,7 +26,7 @@ bool CSpinlaser::HitCharacter(vec2 From, vec2 To)
 	CCharacter *pOwner1Char = GameServer()->GetPlayerChar(m_Owner1);
 	CCharacter *pOwner2Char = GameServer()->GetPlayerChar(m_Owner2);
 	CCharacter *pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pOwner1Char);
-	if(!pHit)
+	if (!pHit)
 		return false;
 
 	m_From = From;
@@ -48,15 +46,14 @@ bool CSpinlaser::HitCharacter(vec2 From, vec2 To)
 	return true;
 }
 
-
 void CSpinlaser::Spin()
 {
 	m_DamageTimer--;
 	vec2 To = m_Pos + m_Dir * m_Energy;
 
-	if(GameServer()->Collision()->IntersectLine(m_Pos, To, 0x0, &To))
+	if (GameServer()->Collision()->IntersectLine(m_Pos, To, 0x0, &To))
 	{
-		if(!HitCharacter(m_Pos, To))
+		if (!HitCharacter(m_Pos, To))
 		{
 			// intersected
 			m_From = m_Pos;
@@ -77,7 +74,6 @@ void CSpinlaser::Reset()
 	GameServer()->m_World.DestroyEntity(this);
 }
 
-
 void CSpinlaser::Update(vec2 Pos, vec2 Dir)
 {
 	m_EvalTick = Server()->Tick();
@@ -85,12 +81,11 @@ void CSpinlaser::Update(vec2 Pos, vec2 Dir)
 	m_Pos = Pos;
 }
 
-
 void CSpinlaser::Tick()
 {
 	Spin();
-	
-	if(Server()->Tick() > m_EvalTick+(Server()->TickSpeed()*GameServer()->Tuning()->m_LaserBounceDelay)/2000.0f)
+
+	if (Server()->Tick() > m_EvalTick + (Server()->TickSpeed() * GameServer()->Tuning()->m_LaserBounceDelay) / 2000.0f)
 	{
 		GameServer()->m_World.DestroyEntity(this);
 		return;
@@ -104,16 +99,17 @@ void CSpinlaser::TickPaused()
 
 void CSpinlaser::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient))
+	if (NetworkClipped(SnappingClient))
 		return;
 
-	CNetObj_Laser *pObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_ID, sizeof(CNetObj_Laser)));
-	if(!pObj)
+	CNetObj_DDNetLaser *pObj = static_cast<CNetObj_DDNetLaser *>(Server()->SnapNewItem(NETOBJTYPE_DDNETLASER, m_ID, sizeof(CNetObj_DDNetLaser)));
+	if (!pObj)
 		return;
 
-	pObj->m_X = (int)m_Pos.x;
-	pObj->m_Y = (int)m_Pos.y;
+	pObj->m_ToX = (int)m_Pos.x;
+	pObj->m_ToY = (int)m_Pos.y;
 	pObj->m_FromX = (int)m_From.x;
 	pObj->m_FromY = (int)m_From.y;
 	pObj->m_StartTick = m_EvalTick;
+	pObj->m_Type = LASERTYPE_DOOR;
 }

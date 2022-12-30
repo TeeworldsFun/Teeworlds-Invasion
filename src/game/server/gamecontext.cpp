@@ -20,6 +20,7 @@
 #include "gamemodes/run.h"
 
 #include <game/server/entities/arrow.h>
+#include <game/server/entities/block.h>
 
 #include <game/server/ai_protocol.h>
 #include <game/server/ai.h>
@@ -67,6 +68,8 @@ void CGameContext::Construct(int Resetting)
 
 	if(Resetting==NO_RESET)
 		m_pVoteOptionHeap = new CHeap();
+
+	m_pBlockSolve = new CBlockSolve(this);
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -994,7 +997,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				//SendChatTarget(ClientID, "/grenade - Throw a grenade");
 				SkipSending = true;
 			}
-			
+
+			/*if (strcmp(pMsg->m_pMessage, "/buildtool") == 0)
+			{
+				if(pPlayer->GetCharacter())
+					pPlayer->GetCharacter()->GiveCustomWeapon(HAMMER_BUILD);
+			}*/
+
 			/*
 			if (strcmp(pMsg->m_pMessage, "/grenade") == 0)
 			{

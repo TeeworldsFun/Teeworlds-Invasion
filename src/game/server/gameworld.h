@@ -29,6 +29,7 @@ public:
 		ENTTYPE_CHARACTER,
 		ENTTYPE_RADAR,
 		ENTTYPE_DOOR,
+		ENTTYPE_BLOCK,
 		NUM_ENTTYPES
 	};
 
@@ -57,6 +58,8 @@ public:
 
 	CEntity *FindFirst(int Type);
 
+	bool CheckBlock(vec2 Pos);
+	bool CheckBlock(float x, float y) { return CheckBlock(vec2(x, y)); };
 	/*
 		Function: find_entities
 			Finds entities close to a position and returns them in a list.

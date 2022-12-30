@@ -80,6 +80,7 @@ enum CustomWeapons
 {
 	HAMMER_BASIC,
 	HAMMER_THUNDER,
+	HAMMER_BUILD,
 	SWORD_KATANA,
 	SWORD_LIGHTNING,
 	GUN_PISTOL,
@@ -134,6 +135,7 @@ enum ProjectileTypes
 	PROJTYPE_NONE,
 	PROJTYPE_HAMMER,
 	PROJTYPE_FLYHAMMER,
+	PROJTYPE_BUILD,
 	PROJTYPE_SWORD,
 	PROJTYPE_BULLET,
 	PROJTYPE_PELLET,
@@ -202,6 +204,28 @@ const CWeapon aCustomWeapon[NUM_CUSTOMWEAPONS] =
 		0, // clip reload time
 		0.75f, // knockback
 		0.0f // self knockback
+		),
+	CWeapon(
+		"Build Tool",
+		"/buy builder",
+		WEAPON_HAMMER,
+		PROJTYPE_BUILD,
+		SOUND_HAMMER_FIRE,
+		-1, // require
+		75, // cost
+		0, // damage
+		SMOKE, // extra1
+		true, // autofire
+		1.0f, // bullet spread
+		1, // shot spread
+		0, // clip size
+		0, // powerup size
+		0, // max ammo
+		2.0f, // bullet life
+		400, // bullet reload time
+		0, // clip reload time
+		0.0f, // knockback
+		1.0f // self knockback
 		),
 	CWeapon(
 		"Katana",
