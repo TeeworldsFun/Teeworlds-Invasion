@@ -164,6 +164,7 @@ public:
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendBroadcast(const char *pText, int ClientID, bool Lock = false, ...);
 
+	void Format_L(const char *LanguageCode, char *Text, ...);
 
 	//
 	void CheckPureTuning();

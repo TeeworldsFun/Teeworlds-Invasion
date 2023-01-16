@@ -100,6 +100,9 @@ public:
 
 	void DisplayExit(vec2 Pos);
 
+	int GetGroupLefts() { return m_GroupsLeft; }
+	int GetEnemiesLefts() { return m_EnemiesLeft; }
+
 	enum GameState
 	{
 		STATE_STARTING,

@@ -324,6 +324,8 @@ void CGameControllerCoop::NextLevel(int CID)
 
 void CGameControllerCoop::Tick()
 {
+	g_Config.m_SvInvELeft = m_EnemiesLeft;
+	g_Config.m_SvInvGroupLeft = m_GroupsLeft;
 	IGameController::Tick();
 
 	if (m_GameState == STATE_FAIL)

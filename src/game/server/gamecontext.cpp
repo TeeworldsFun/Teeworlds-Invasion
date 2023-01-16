@@ -276,7 +276,7 @@ void CGameContext::CreateSoundGlobal(int Sound, int Target)
 
 bool CGameContext::IsBot(int ClientID)
 {
-	if (m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pAI)
+	if (ClientID >= 0 && m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pAI)
 		return true;
 
 	return false;
@@ -682,8 +682,18 @@ void CGameContext::OnTick()
 			m_apPlayers[i]->PostTick();
 			if (m_apPlayers[i]->m_ShowWelcomMotd && Server()->Tick() % 100 == 0)
 			{
+				dynamic_string buf;
+				Server()->Localization()->Format_L(buf, m_apPlayers[i]->m_Language,
+												   _(
+													   "Level {%d} - Fails {%d}\n"
+													   "Group Lefts - {%d}\n"
+													   "Enemies Lefts - {%d}\n"
+													   "\n\n\n\n\n\n"
+													   "            Press F4 to close."),
+												   g_Config.m_SvMapGenLevel, g_Config.m_SvInvFails, g_Config.m_SvInvGroupLeft, 
+												   g_Config.m_SvInvELeft);
 				CNetMsg_Sv_Motd Msg;
-				Msg.m_pMessage = g_Config.m_SvWelcomeMsg;
+				Msg.m_pMessage = buf.buffer();
 				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
 			}
 		}
@@ -781,6 +791,18 @@ void CGameContext::OnTick()
 #endif
 }
 
+void CGameContext::Format_L(const char *LanguageCode, char *Text, ...)
+{
+	va_list VarArgs;
+	va_start(VarArgs, Text);
+
+	dynamic_string buf;
+	buf.append((const char *)Text);
+	Server()->Localization()->Format_L(buf, LanguageCode, _(Text), VarArgs);
+	str_copy(Text, buf.buffer(), sizeof(Text));
+	va_end(VarArgs);
+}
+
 bool CGameContext::AIInputUpdateNeeded(int ClientID)
 {
 	if (m_apPlayers[ClientID])
@@ -865,6 +887,8 @@ void CGameContext::OnClientEnter(int ClientID)
 			break;
 		}
 	}
+
+	SendChatTarget(-1, _("Cnm {%s}"), "Help");
 
 	m_VoteUpdate = true;
 }

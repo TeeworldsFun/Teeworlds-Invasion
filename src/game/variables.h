@@ -146,7 +146,9 @@ MACRO_CONFIG_INT(SvMapGenRandSeed, sv_mapgen_random_seed, 1, 0, 1, CFGFLAG_SERVE
 // Invasion
 MACRO_CONFIG_INT(SvInvFails, sv_inv_fails,  0, 0, 9, CFGFLAG_SERVER, "Invasion level fails")
 MACRO_CONFIG_INT(SvInvBosses, sv_inv_bosses,  0, 0, 99, CFGFLAG_SERVER, "Invasion level bosses")
-MACRO_CONFIG_STR(SvInvMap, sv_dont_use_j92tka9j, 128, "", CFGFLAG_SERVER, "Latest invasion map")
+MACRO_CONFIG_STR(SvInvMap, sv_dont_use_j92zjhgsabkjznbdatka9j, 128, "", CFGFLAG_SERVER, "Latest invasion map")
+MACRO_CONFIG_INT(SvInvGroupLeft, sv_dont_use_j92213gyahjbd837tka9j, 0, 0, 9999999, CFGFLAG_SERVER, "Latest invasion map")
+MACRO_CONFIG_INT(SvInvELeft, sv_dont_use_j92tka9zi8ywhsadhi87yihvxmcnzj, 0, 0, 9999999, CFGFLAG_SERVER, "Latest invasion map")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
@@ -155,7 +157,5 @@ MACRO_CONFIG_STR(SvInvMap, sv_dont_use_j92tka9j, 128, "", CFGFLAG_SERVER, "Lates
 
 MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
-
-MACRO_CONFIG_STR(SvWelcomeMsg, sv_welcome_msg, 1600, "", CFGFLAG_SERVER, "Message for the enter clients(as motd)")
 
 #endif
