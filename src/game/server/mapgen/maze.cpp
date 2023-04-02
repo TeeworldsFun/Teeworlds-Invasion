@@ -60,9 +60,9 @@ void CMaze::Generate()
 			
 		
 		// rising acid
-		if (Level%10 == 9)
+		if (Level <= 10)
 		{
-			int r = 4+min(14, Level/3);
+			int r = 30;
 
 
 			float s = 0.15f+frandom()*0.15f;
@@ -100,12 +100,6 @@ void CMaze::Generate()
 				GenerateRoom();
 			
 			//ConnectRooms();
-			ConnectEverything();
-		}
-		// first rounds
-		else if (Level <= 10)
-		{
-			GenerateLinear(min(80+Level*5, 90+Level*2), Level);
 		}
 		// Z
 		else if (Level%10 == 8)
@@ -155,7 +149,7 @@ void CMaze::Generate()
 		}
 		else if (Level%10 == 0)
 		{
-			int r = min(20, Level/3);
+			int r = 50;
 
 			float s = 0.12f+frandom()*0.15f;
 			float sy = 0.4f+frandom()*0.15f;
@@ -388,7 +382,7 @@ void CMaze::GenerateRoom(bool AutoConnect, bool MirrorMode)
 			if (fabs(p.x - rp.x) > 8 && fabs(p.y - rp.y) > 8)
 				Valid = false;
 			
-			if (d < 20.0f || d > 60.0f) // || d > 40.0f)
+			if (d < 40.0f || d > 120.0f) // || d > 40.0f)
 				Valid = false;
 		}
 				

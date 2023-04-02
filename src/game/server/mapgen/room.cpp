@@ -21,7 +21,7 @@ CRoom::CRoom(int x, int y, int w, int h)
 	int i = 0;
 	
 	//int RoomSize = 6+rand()%10;
-	int RoomSize = 6+rand()%6;
+	int RoomSize = 6+rand()%64;
 	
 	if (m_H < m_W)
 	{
@@ -57,7 +57,7 @@ void CRoom::Split(bool Vertical)
 		int h2 = m_H;
 		
 		if (m_W < 32)
-			m_H = 3 + rand()%(m_H-6);
+			m_H = 30 + rand()%(m_H);
 		else
 			m_H = m_H/(2 + rand()%2);
 		
@@ -72,9 +72,9 @@ void CRoom::Split(bool Vertical)
 		int w2 = m_W;
 		
 		if (m_H < 32)
-			m_W = 3 + rand()%(m_W-6);
+			m_W = 30 + rand()%m_W;
 		else
-			m_W = m_W/(2 + rand()%2);
+			m_W = m_W/(6 + rand()%12);
 
 		if (!m_pChild1)
 			m_pChild1 = new CRoom(m_X, m_Y, m_W, m_H);

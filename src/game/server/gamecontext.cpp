@@ -18,6 +18,7 @@
 #include "gamemodes/cstt.h"
 #include "gamemodes/csbb.h"
 #include "gamemodes/run.h"
+#include "gamemodes/alert.h"
 
 #include <game/server/entities/arrow.h>
 #include <game/server/entities/block.h>
@@ -2173,7 +2174,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// players = new CPlayer[MAX_CLIENTS];
 
 	// select gametype
-	if (str_comp(g_Config.m_SvGametype, "coop") == 0)
+	/*if (str_comp(g_Config.m_SvGametype, "coop") == 0)
 		m_pController = new CGameControllerCoop(this);
 	else if (str_comp(g_Config.m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
@@ -2186,7 +2187,9 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	else if (str_comp(g_Config.m_SvGametype, "csbb") == 0)
 		m_pController = new CGameControllerCSBB(this);
 	else
-		m_pController = new CGameControllerDM(this);
+		m_pController = new CGameControllerDM(this);*/
+
+	m_pController = new CGameControllerAlert(this);
 
 	if (g_Config.m_SvMapGen && !m_pServer->m_MapGenerated)
 	{

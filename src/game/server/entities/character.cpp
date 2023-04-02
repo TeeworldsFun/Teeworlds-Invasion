@@ -1447,6 +1447,7 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
+	m_Core.m_Vel = vec2(0.f, 0.f);
 	if (m_PainSoundTimer > 0)
 		m_PainSoundTimer--;
 
@@ -1484,15 +1485,17 @@ void CCharacter::Tick()
 	}
 	*/
 
+	if (m_Input.m_Jump)
+	{
+		if(!GameServer()->Collision()->CheckPoint(vec2(m_Core.m_Pos.x + (normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY)).x * 16), m_Core.m_Pos.y)))
+			m_Core.m_Pos.x += normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY)).x * 16;
+		if(!GameServer()->Collision()->CheckPoint(vec2(m_Core.m_Pos.x, m_Core.m_Pos.y + (normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY)).y * 16))))
+			m_Core.m_Pos.y += normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY)).y * 16;
+	}
 	if (GameServer()->m_FreezeCharacters)
 		ResetInput();
 
 	m_Core.m_Input = m_Input;
-
-	if (GetPlayer()->GotAbility(ANTIIMPACTARMOR))
-		m_Core.m_Vel += m_Recoil * 0.42f;
-	else
-		m_Core.m_Vel += m_Recoil * 0.7f;
 
 	m_Recoil *= 0.5f;
 
@@ -1545,6 +1548,7 @@ void CCharacter::Tick()
 
 void CCharacter::TickDefered()
 {
+	m_Core.m_Vel = vec2(0.f, 0.f);
 	// advance the dummy
 	{
 		CWorldCore TempWorld;
@@ -1556,7 +1560,7 @@ void CCharacter::TickDefered()
 
 	// lastsentcore
 	vec2 StartPos = m_Core.m_Pos;
-	vec2 StartVel = m_Core.m_Vel;
+	vec2 StartVel = vec2(0.f, 0.f);
 	bool StuckBefore = GameServer()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 
 	m_Core.Move();
@@ -1908,14 +1912,14 @@ void CCharacter::TakeDeathtileDamage()
 
 	m_Core.m_Jumped = 0;
 
-	if (!top && bot)
-		m_Core.m_Vel.y = -5.0f;
-	if (!bot && top)
-		m_Core.m_Vel.y = +5.0f;
-	if (!left && right)
-		m_Core.m_Vel.x = -5.0f;
-	if (!right && left)
-		m_Core.m_Vel.x = +5.0f;
+	// if (!top && bot)
+	//	m_Core.m_Vel.y = -5.0f;
+	// if (!bot && top)
+	//	m_Core.m_Vel.y = +5.0f;
+	// if (!left && right)
+	//	m_Core.m_Vel.x = -5.0f;
+	// if (!right && left)
+	//	m_Core.m_Vel.x = +5.0f;
 
 	m_LatestHitVel = GetVel();
 

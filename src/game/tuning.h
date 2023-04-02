@@ -17,7 +17,7 @@ MACRO_TUNING_PARAM(HookLength, hook_length, 380.0f)
 MACRO_TUNING_PARAM(HookFireSpeed, hook_fire_speed, 80.0f)
 MACRO_TUNING_PARAM(HookDragAccel, hook_drag_accel, 3.0f)
 MACRO_TUNING_PARAM(HookDragSpeed, hook_drag_speed, 15.0f)
-MACRO_TUNING_PARAM(Gravity, gravity, 0.5f)
+MACRO_TUNING_PARAM(Gravity, gravity, 0.f)
 
 MACRO_TUNING_PARAM(VelrampStart, velramp_start, 550)
 MACRO_TUNING_PARAM(VelrampRange, velramp_range, 2000)

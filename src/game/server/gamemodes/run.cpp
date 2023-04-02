@@ -171,7 +171,22 @@ bool CGameControllerCoop::CanSpawn(int Team, vec2 *pOutPos, bool IsBot)
 
 void CGameControllerCoop::OnCharacterSpawn(CCharacter *pChr, bool RequestAI)
 {
-	IGameController::OnCharacterSpawn(pChr);
+	// default health
+	if (!RequestAI)
+		pChr->SetHealth(500);
+	else
+		pChr->SetHealth(100);
+
+	if (g_Config.m_SvHammerFight)
+	{
+		pChr->GiveCustomWeapon(HAMMER_THUNDER);
+		pChr->SetCustomWeapon(HAMMER_THUNDER);
+	}
+	else
+		pChr->GiveCustomWeapon(GUN_PISTOL);
+
+	if (pChr->GetPlayer()->m_pAI)
+		pChr->GetPlayer()->m_pAI->Reset();
 
 	// init AI
 	if (RequestAI)
@@ -231,6 +246,7 @@ void CGameControllerCoop::Trigger(bool IncreaseLevel)
 
 void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 {
+	return; //NoNo
 	m_EnemyCount = 0;
 	m_EnemiesLeft = 20;
 	m_GroupSpawnTick = 0;
