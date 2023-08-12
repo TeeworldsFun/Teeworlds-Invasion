@@ -604,6 +604,8 @@ bool CCollision::ModifTile(ivec2 pos, int group, int layer, int tile, int flags,
 
 void CCollision::CreateBlock(vec2 Pos, int Type)
 {
+	m_pTiles[((int)Pos.y/32) * m_Width + ((int)Pos.x/32)].m_Index = TILE_SOLID;
+	return;
 	CBlockSolid Tmp;
 	Tmp.m_Pos = Pos;
 	Tmp.m_Type = Type;
@@ -616,7 +618,7 @@ CBlockSolid *CCollision::FindBlock(vec2 Pos)
 	for (int i = 0; i < m_pBlockSolid.size(); i++)
 	{
 		//dbg_msg("Pos", "x: %f,%f y: %f,%f", m_pBlockSolid[i].m_Pos.x, Pos.x, m_pBlockSolid[i].m_Pos.y, Pos.y);
-		if (distance(m_pBlockSolid[i].m_Pos, Pos) < 24.0f)
+		if (distance(m_pBlockSolid[i].m_Pos, Pos) < 32.0f)
 			return &m_pBlockSolid[i];
 	}
 	return nullptr;

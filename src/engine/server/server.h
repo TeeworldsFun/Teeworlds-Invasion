@@ -80,7 +80,7 @@ public:
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
 
-	class CPlayerData *GetPlayerData(int ClientID, int ColorID);
+	class CPlayerData *GetPlayerData(int ClientID, const char *TimeoutID);
 	int GetHighScore();
 	int GetPlayerCount();
 

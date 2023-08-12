@@ -234,8 +234,6 @@ void CAIinvasion::OnCharacterSpawn(CCharacter *pChr)
 		break;
 	}
 
-	m_PowerLevel *= 2;
-
 	if (!m_Triggered)
 		m_ReactionTime = 100;
 }

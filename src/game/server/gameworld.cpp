@@ -247,7 +247,7 @@ CCharacter *CGameWorld::ClosestCharacter(vec2 Pos, float Radius, CEntity *pNotTh
 bool CGameWorld::CheckBlock(vec2 Pos)
 {
 	CEntity *pEnt;
-	int Num = FindEntities(Pos, 14.0f, &pEnt, 9999, ENTTYPE_BLOCK);
+	int Num = FindEntities(Pos, 16.0f, &pEnt, 9999, ENTTYPE_BLOCK);
 	if (Num)
 		return true;
 	return false;

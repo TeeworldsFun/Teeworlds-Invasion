@@ -2520,7 +2520,7 @@ int CServer::GetPlayerCount()
 	return 1;
 }
 
-CPlayerData *CServer::GetPlayerData(int ClientID, int ColorID)
+CPlayerData *CServer::GetPlayerData(int ClientID, const char *TimeoutID)
 {
 	if (ClientID < 0 || ClientID >= MAX_CLIENTS)
 		return NULL;
@@ -2533,20 +2533,20 @@ CPlayerData *CServer::GetPlayerData(int ClientID, int ColorID)
 						
 	if (m_pPlayerData)
 	{
-		CPlayerData *pData = m_pPlayerData->Get(m_aClients[ClientID].m_aName, ColorID);
+		CPlayerData *pData = m_pPlayerData->Get(m_aClients[ClientID].m_aName, TimeoutID);
 	
 		if (pData)
 			return pData;
 		else
 		{
-			CPlayerData *pNewData = new CPlayerData(m_aClients[ClientID].m_aName, ColorID);
+			CPlayerData *pNewData = new CPlayerData(m_aClients[ClientID].m_aName, TimeoutID);
 			m_pPlayerData->Add(pNewData);
 			return pNewData;
 		}
 	}
 	else
 	{
-		m_pPlayerData = new CPlayerData(m_aClients[ClientID].m_aName, ColorID);
+		m_pPlayerData = new CPlayerData(m_aClients[ClientID].m_aName, TimeoutID);
 		return m_pPlayerData;
 	}
 	

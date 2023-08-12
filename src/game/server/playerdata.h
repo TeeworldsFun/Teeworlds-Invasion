@@ -9,12 +9,13 @@ private:
 	CPlayerData *m_pChild2;
 
 public:
-	CPlayerData(const char *pName, int ColorID);
+	CPlayerData(const char *pName, const char *TimeoutID);
 	void Die();
 	void Reset();
 	
 	int m_aWeaponType[99];
 	int m_aWeaponAmmo[99];
+	int m_aWeaponAmmoReserved[99];
 	
 	int m_aAmmo[99];
 	int m_Weapon;
@@ -26,12 +27,12 @@ public:
 	int m_HighestLevel;
 	int m_HighestLevelSeed;
 	
-	int m_ColorID;
+	char m_TimeoutID[256];
 	
 	char m_aName[16];
 	
 	void Add(CPlayerData *pPlayerData);
-	CPlayerData *Get(const char *pName, int ColorID);
+	CPlayerData *Get(const char *pName, const char *TimeoutID);
 	
 	int GetHighScore(int Score);
 	int GetPlayerCount(int Score);

@@ -223,6 +223,8 @@ public:
 	void TriggerEscape();
 	virtual void DisplayExit(vec2 Pos);
 	virtual void NextLevel(int CID = -1);
+
+	int GetRoundStartTick() { return m_RoundStartTick; }
 };
 
 #endif

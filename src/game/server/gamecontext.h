@@ -236,6 +236,8 @@ public:
 	// MapGen
 	virtual void SaveMap(const char *path);
 	void GenerateMap();
+
+	const char* Localize(const char *pLanguageCode, const char *pText);
 };
 
 inline int CmaskAll() { return -1; }

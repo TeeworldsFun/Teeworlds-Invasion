@@ -680,22 +680,6 @@ void CGameContext::OnTick()
 		{
 			m_apPlayers[i]->Tick();
 			m_apPlayers[i]->PostTick();
-			if (m_apPlayers[i]->m_ShowWelcomMotd && Server()->Tick() % 100 == 0)
-			{
-				dynamic_string buf;
-				Server()->Localization()->Format_L(buf, m_apPlayers[i]->m_Language,
-												   _(
-													   "Level {%d} - Fails {%d}\n"
-													   "Group Lefts - {%d}\n"
-													   "Enemies Lefts - {%d}\n"
-													   "\n\n\n\n\n\n"
-													   "            Press F4 to close."),
-												   g_Config.m_SvMapGenLevel, g_Config.m_SvInvFails, g_Config.m_SvInvGroupLeft, 
-												   g_Config.m_SvInvELeft);
-				CNetMsg_Sv_Motd Msg;
-				Msg.m_pMessage = buf.buffer();
-				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
-			}
 		}
 	}
 
@@ -1026,11 +1010,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				SkipSending = true;
 			}
 
-			/*if (strcmp(pMsg->m_pMessage, "/buildtool") == 0)
+			if (strcmp(pMsg->m_pMessage, "/buildtool") == 0)
 			{
 				if(pPlayer->GetCharacter())
 					pPlayer->GetCharacter()->GiveCustomWeapon(HAMMER_BUILD);
-			}*/
+			}
 
 			/*
 			if (strcmp(pMsg->m_pMessage, "/grenade") == 0)
@@ -1104,6 +1088,17 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				SendChatTarget(ClientID, "Adding bot...");
 				AddBot();
+
+				SkipSending = true;
+			}
+
+			if (!strncmp(pMsg->m_pMessage, "/timeout", 8))
+			{
+				char Timeout[256];
+				if(sscanf(pMsg->m_pMessage, "/timeout %s", Timeout) == 1)
+					str_copy(pPlayer->m_TimeoutID, Timeout, sizeof(pPlayer->m_TimeoutID));
+				
+				pPlayer->GetCharacter()->GiveStartWeapon();
 
 				SkipSending = true;
 			}
@@ -2589,6 +2584,12 @@ void CGameContext::AddVote(const char *Desc, const char *Cmd, int ClientID)
 void CGameContext::OnShutdown()
 {
 	KickBots();
+	if (str_comp(m_pController->m_pGameType, "coop") == 0)
+	{
+		for (int i = 0; i < MAX_CLIENTS; i++)
+			if (m_apPlayers[i])
+				m_apPlayers[i]->SaveData();
+	}
 	delete m_pController;
 	m_pController = 0;
 	Clear();
@@ -2701,4 +2702,9 @@ void CGameContext::OnSetAuthed(int ClientID, int Level)
 {
 	if (m_apPlayers[ClientID])
 		m_apPlayers[ClientID]->m_Authed = Level;
+}
+
+const char* CGameContext::Localize(const char *pLanguageCode, const char *pText)
+{
+	return Server()->Localization()->Localize(pLanguageCode, pText);
 }

@@ -1243,16 +1243,21 @@ void CCharacter::GiveStartWeapon()
 			return;
 
 		// load saved weapons
-		CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetColorID());
+		CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetTimeoutID());
 
 		bool GotItems = false;
 
-		for (int i = 0; i < NUM_WEAPONS; i++)
+		for (int i = 0; i < NUM_CUSTOMWEAPONS; i++)
 		{
 			if (pData->m_aWeaponType[i])
 			{
-				GiveCustomWeapon(pData->m_aWeaponType[i]);
+				m_aWeapon[i].m_Got = true;
+				m_aWeapon[i].m_Ammo = pData->m_aWeaponAmmo[i];
+				m_aWeapon[i].m_AmmoReserved = pData->m_aWeaponAmmoReserved[i];
 			}
+			
+			if (m_aWeapon[i].m_Got)
+				GotItems = true;
 		}
 
 		if (!GotItems)
@@ -1265,9 +1270,7 @@ void CCharacter::GiveStartWeapon()
 		GetPlayer()->m_Score = pData->m_Score;
 		GetPlayer()->m_Gold = pData->m_Gold;
 
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "Data load - color={%d}", GetPlayer()->GetColorID());
-		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "Character", aBuf);
+		dbg_msg("PlayerData", "Data load - ID=%s", GetPlayer()->GetTimeoutID());
 
 		return;
 	}
@@ -2056,7 +2059,7 @@ void CCharacter::SaveData()
 	if (m_IsBot || !m_Spawned || !str_comp(g_Config.m_SvGametype, "coop") == 0)
 		return;
 
-	CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetColorID());
+	CPlayerData *pData = GameServer()->Server()->GetPlayerData(GetPlayer()->GetCID(), GetPlayer()->GetTimeoutID());
 
 	pData->m_Kits = m_Kits;
 	pData->m_Armor = m_Armor;
@@ -2069,8 +2072,17 @@ void CCharacter::SaveData()
 		pData->m_HighestLevelSeed = g_Config.m_SvMapGenSeed;
 	}
 
-	char aBuf[256];
+	for (int i = 0; i < NUM_CUSTOMWEAPONS; i++)
+	{
+		if (m_aWeapon[i].m_Got)
+		{
+			pData->m_aWeaponType[i] = i;
+			pData->m_aWeaponAmmo[i] = m_aWeapon[i].m_Ammo;
+			pData->m_aWeaponAmmo[i] = m_aWeapon[i].m_AmmoReserved;
+		}
+		else
+			pData->m_aWeaponType[i] = 0;
+	}
 
-	str_format(aBuf, sizeof(aBuf), "Data save - color={%d}", GetPlayer()->GetColorID());
-	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "Character", aBuf);
+	dbg_msg("PlayerData", "Data save - ID=%s", GetPlayer()->GetTimeoutID());
 }

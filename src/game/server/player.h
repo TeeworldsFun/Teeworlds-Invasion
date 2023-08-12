@@ -70,7 +70,7 @@ public:
 	void SetWantedTeam(int Team, bool DoChatMsg=true);
 	int GetTeam() const { return m_Team; };
 
-	int GetColorID();
+	const char *GetTimeoutID();
 
 	/*
 	int GetTeam()
@@ -302,6 +302,8 @@ public:
 	{
 		str_copy(m_Language, Language, sizeof(m_Language));
 	}
+
+	char m_TimeoutID[256];
 
 private:
 	bool m_Spectate;

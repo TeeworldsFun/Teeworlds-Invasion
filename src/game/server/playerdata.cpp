@@ -3,13 +3,13 @@
 
 #include "playerdata.h"
 
-CPlayerData::CPlayerData(const char *pName, int ColorID)
+CPlayerData::CPlayerData(const char *pName, const char *TimeoutID)
 {
 	m_pChild1 = 0;
 	m_pChild2 = 0;
 	
 	str_copy(m_aName, pName, 16);
-	m_ColorID = ColorID;
+	str_copy(m_TimeoutID, TimeoutID, 256);
 	
 	Reset();
 }
@@ -20,9 +20,9 @@ void CPlayerData::Die()
 
 void CPlayerData::Add(CPlayerData *pPlayerData)
 {
-	int Color = pPlayerData->m_ColorID;
+	const char *Color = pPlayerData->m_TimeoutID;
 	
-	if (Color < m_ColorID)
+	if (str_comp(Color, m_TimeoutID) != 0)
 	{
 		if (m_pChild1)
 			m_pChild1->Add(pPlayerData);
@@ -38,25 +38,25 @@ void CPlayerData::Add(CPlayerData *pPlayerData)
 	}
 }
 
-CPlayerData *CPlayerData::Get(const char *pName, int ColorID)
+CPlayerData *CPlayerData::Get(const char *pName, const char *TimeoutID)
 {
-	if (ColorID == m_ColorID)
+	if (str_comp(TimeoutID, m_TimeoutID) == 0)
 	{
 		if(str_comp(pName, m_aName) == 0)
 			return this;
 	}
 	
-	if (ColorID < m_ColorID)
+	if (str_comp(TimeoutID, m_TimeoutID) != 0)
 	{
 		if (m_pChild1)
-			return m_pChild1->Get(pName, ColorID);
+			return m_pChild1->Get(pName, TimeoutID);
 		else
 			return 0;
 	}
 	else
 	{
 		if (m_pChild2)
-			return m_pChild2->Get(pName, ColorID);
+			return m_pChild2->Get(pName, TimeoutID);
 		else
 			return 0;
 	}
@@ -97,6 +97,7 @@ void CPlayerData::Reset()
 	{
 		m_aWeaponType[i] = 0;
 		m_aWeaponAmmo[i] = 0;
+		m_aWeaponAmmoReserved[i] = 0;
 		
 		m_aAmmo[i] = -1;
 	}

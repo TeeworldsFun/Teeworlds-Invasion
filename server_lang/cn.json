@@ -30,7 +30,7 @@
         },
         {
             "key": "Hide",
-            "value": "别让傻子找到你"
+            "value": "\"我 来 找 你 了\""
         },
         {
             "key": "Escape",
@@ -54,7 +54,7 @@
         },
         {
             "key": "Everybody dies",
-            "value": "古筝计划"
+            "value": "死亡的氛围席卷上来"
         },
         {
             "key": "{%s} scores for blue team!",
@@ -239,6 +239,22 @@
         {
             "key": "'{%s}' has left the game",
             "value": "'{%s}' 退出了游戏"
+        },
+        {
+            "key": "Level : {%d}",
+            "value": "第{%d}关"
+        },
+        {
+            "key": "Fails : {%d}",
+            "value": "失败次数：{%d}"
+        },
+        {
+            "key": "Map Send : {%d}",
+            "value": "地图种子：{%d}"
+        },
+        {
+            "key": "Group Left : {%d}",
+            "value": "还需防守{%d}波"
         },
         {
             "key": "Teams have been balanced",

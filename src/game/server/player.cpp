@@ -631,6 +631,7 @@ void CPlayer::EraseWeapons()
 
 void CPlayer::GiveSavedWeapons()
 {
+	return;
 	if (!GetCharacter())
 		return;
 	
@@ -809,9 +810,9 @@ void CPlayer::SaveData()
 		GetCharacter()->SaveData();
 }
 
-int CPlayer::GetColorID()
+const char *CPlayer::GetTimeoutID()
 {
-	return m_TeeInfos.m_ColorSkin;
+	return m_TimeoutID;
 }
 
 bool CPlayer::IncreaseGold(int Amount)

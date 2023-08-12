@@ -21,13 +21,12 @@ CGameControllerCoop::CGameControllerCoop(class CGameContext *pGameServer)
 
 	m_BotSpawnTick = 0;
 
+	srand(g_Config.m_SvMapGenLevel + g_Config.m_SvMapGenSeed);
 	if (g_Config.m_SvMapGenRandSeed)
 	{
 		g_Config.m_SvMapGenSeed = rand() % 32767;
 		g_Config.m_SvMapGenRandSeed = 0;
 	}
-
-	srand(g_Config.m_SvMapGenLevel + g_Config.m_SvMapGenSeed);
 
 	for (int i = 0; i < MAX_ENEMIES; i++)
 		m_aEnemySpawnPos[i] = vec2(0, 0);
@@ -260,6 +259,11 @@ void CGameControllerCoop::SpawnNewGroup(bool AddBots)
 	m_Deaths = m_EnemiesLeft;
 	m_Group++;
 	m_GroupsLeft--;
+
+	GameServer()->SendChatTarget(-1, _("Level : {%d}"), Level);
+	GameServer()->SendChatTarget(-1, _("Group Left : {%d}"), m_GroupsLeft);
+	GameServer()->SendChatTarget(-1, _("Fails : {%d}"), g_Config.m_SvInvFails);
+	GameServer()->SendChatTarget(-1, _("Map Send : {%d}"), g_Config.m_SvMapGenSeed);
 }
 
 void CGameControllerCoop::DisplayExit(vec2 Pos)
